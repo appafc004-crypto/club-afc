@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Panel de socios</title>
+
+<!-- Tipografías de la marca. Si no hay internet, caen a las alternativas
+     del sistema definidas en --serif y --sans. La app funciona igual. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   TOKENS DE DISEÑO — dirección 05 · BOUTIQUE
+   Sale de 01_DISENO_SOCIOS_5_OPCIONES.html y de 01_INVESTIGACION_MARCA.pdf.
+   Todo el color y toda la tipografía viven acá. No hay un solo valor suelto
+   en el resto del archivo: cuando llegue la identidad final de la ONG, se
+   cambian estas variables y cambia la app entera.
+   ========================================================================== */
+:root{
+  /* --- Base --- */
+  --negro:#000000;
+  --blanco:#ffffff;
+  --texto:#111111;
+  --texto-2:#6b6b6b;
+  --texto-3:#8b8b8b;
+
+  /* --- Acento: dorado de la marca ---
+     El claro solo va sobre negro. Sobre fondo claro se usa el oscuro,
+     porque el claro no llega al contraste mínimo y no se lee al sol. */
+  --dorado:#C9A24A;
+  --dorado-oscuro:#8A6A2F;
+
+  /* --- Líneas y campos --- */
+  --linea:#E6E1D6;
+  --linea-suave:#EFEBE2;
+  --campo-bg:#F4F2ED;
+  --campo-borde:#DFDAD0;
+
+  /* --- Estados. Derivados de los lacres de la marca (rojo y verde),
+         bajados de saturación para que se lean como aviso y no como adorno. --- */
+  --ok:#2E6B4F;      --ok-bg:#EEF4F0;
+  --err:#A31C1F;     --err-bg:#FBF0F0;
+  --avi:#8A6A2F;     --avi-bg:#F8F3E9;
+  --neu:#33383D;     --neu-bg:#F4F2ED;
+
+  /* --- Tipografía. Serif solo de 19px para arriba: en cuerpo chico
+         se rompe y cansa la vista en celular. --- */
+  --serif:"Playfair Display", Georgia, "Times New Roman", serif;
+  --sans:"Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* --- Medidas. Radio 0 en todo: la identidad no tiene una sola
+         esquina redondeada. --- */
+  --pad:20px;
+  --nav-h:62px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--blanco);color:var(--texto);
+  font-family:var(--sans);font-size:14px;font-weight:400;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit;border-radius:0}
+input,textarea{font-family:inherit;font-size:16px;border-radius:0} /* 16px evita el zoom de iOS */
+:focus-visible{outline:2px solid var(--dorado-oscuro);outline-offset:2px}
+
+/* ===== Piezas tipográficas reutilizables ===== */
+.rotulo{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+.serif{font-family:var(--serif);font-weight:700}
+.cifra{font-variant-numeric:tabular-nums}
+
+/* ===== Íconos ===== */
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ico{width:1em;height:1em;flex:0 0 auto;display:inline-block;vertical-align:-.12em}
+
+/* ===== Precio en tokens — un solo formato en toda la app ===== */
+.tok{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums;font-weight:600}
+.tok .ico{color:var(--dorado-oscuro)}
+
+/* ==========================================================================
+   BOTONES
+   ========================================================================== */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:var(--negro);color:var(--blanco);
+  padding:15px;font-size:11px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;text-align:center;
+  transition:opacity .15s;
+}
+.btn:active{opacity:.82}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn-sec{background:transparent;color:var(--texto);border:1px solid var(--negro)}
+.btn-linea{background:transparent;color:var(--texto-2);border:1px solid var(--linea)}
+.btn-peligro{background:transparent;color:var(--err);border:1px solid var(--err)}
+.btn-sm{width:auto;padding:11px 18px;font-size:10px}
+
+/* ==========================================================================
+   CAMPOS
+   ========================================================================== */
+.campo{margin-bottom:16px}
+.campo label{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:500;color:var(--texto-2);margin-bottom:7px}
+.campo input,.campo textarea{
+  width:100%;padding:13px;background:var(--campo-bg);
+  border:1px solid var(--campo-borde);color:var(--texto);outline:none;resize:vertical;
+}
+.campo input:focus,.campo textarea:focus{outline:2px solid var(--negro);outline-offset:-2px}
+
+/* ==========================================================================
+   SELECTOR DE IDIOMA
+   ========================================================================== */
+.idioma{display:inline-flex;border:1px solid currentColor;flex:0 0 auto}
+.idioma button{
+  padding:5px 9px;font-size:9.5px;letter-spacing:.12em;font-weight:600;
+  text-transform:uppercase;opacity:.55;
+}
+.idioma button[aria-pressed="true"]{opacity:1;background:currentColor}
+.idioma button[aria-pressed="true"] span{mix-blend-mode:difference;color:#fff}
+
+/* ==========================================================================
+   LOGIN
+   ========================================================================== */
+#login{position:fixed;inset:0;background:var(--blanco);z-index:60;overflow-y:auto}
+#login .marco{max-width:430px;margin:0 auto;min-height:100%}
+
+#login .cabecera{
+  background:var(--negro);color:var(--blanco);
+  padding:calc(34px + env(safe-area-inset-top,0px)) 26px 40px;position:relative;
+}
+#login .idioma-pos{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:20px}
+
+/* Hueco reservado para el logo. La marca todavía no lo entregó:
+   el espacio queda dimensionado, el símbolo no se inventa. */
+.hueco-logo{
+  width:76px;height:76px;margin:0 auto 22px;
+  border:1px solid rgba(201,162,74,.45);
+  display:flex;align-items:center;justify-content:center;
+}
+.hueco-logo span{font-size:7.5px;letter-spacing:.16em;color:rgba(255,255,255,.35);
+  text-transform:uppercase;text-align:center;line-height:1.5;padding:0 6px}
+
+#login .marca{text-align:center}
+#login .marca .nombre{
+  font-family:var(--serif);font-weight:700;font-size:26px;
+  letter-spacing:.13em;text-indent:.13em;margin:0;
+}
+#login .marca .bajada{
+  font-size:9px;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;
+  color:var(--dorado);margin:10px 0 0;font-weight:500;
+}
+#login .form{padding:34px 26px 0}
+#login-error{display:none;background:var(--err-bg);color:var(--err);
+  border-left:2px solid var(--err);padding:12px 14px;font-size:12.5px;margin-bottom:18px}
+#login .legal{text-align:center;font-size:10.5px;line-height:1.7;color:var(--texto-3);
+  padding:26px 26px calc(30px + env(safe-area-inset-bottom,0px))}
+
+/* ==========================================================================
+   ESTRUCTURA DE LA APP
+   ========================================================================== */
+#app{display:none;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+
+header{
+  position:sticky;top:0;z-index:30;
+  background:var(--negro);color:var(--blanco);
+  padding:calc(14px + env(safe-area-inset-top,0px)) var(--pad) 14px;
+}
+header .fila{display:flex;align-items:center;gap:12px}
+header .quien{flex:1;min-width:0}
+header .club{font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:#bdbdbd;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .nombre{font-size:14px;font-weight:500;margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .salir{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:#bdbdbd;font-weight:500;padding:6px 2px}
+header .barra-saldo{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  border-top:1px solid rgba(255,255,255,.14);margin-top:13px;padding-top:13px;
+}
+header .barra-saldo .rotulo{color:#9a9a9a}
+header .barra-saldo .tok{font-size:19px;color:var(--dorado)}
+header .barra-saldo .tok .ico{color:var(--dorado)}
+
+.screen{display:none;max-width:900px;margin:0 auto}
+.screen.active{display:block}
+.pad{padding:0 var(--pad)}
+
+/* Encabezado de sección: título serif + filete dorado centrado */
+.titulo-sec{padding:26px var(--pad) 18px;text-align:center}
+.titulo-sec h1{font-family:var(--serif);font-weight:700;font-size:20px;
+  letter-spacing:.2em;text-indent:.2em;text-transform:uppercase;margin:0}
+.titulo-sec p{margin:9px 0 0;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--texto-3);font-weight:500}
+.titulo-sec::after{content:"";display:block;height:1px;background:var(--dorado-oscuro);
+  max-width:110px;margin:17px auto 0}
+
+/* ==========================================================================
+   CATÁLOGO
+   ========================================================================== */
+.colecciones{
+  display:flex;gap:0;overflow-x:auto;padding:14px var(--pad) 0;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.colecciones::-webkit-scrollbar{display:none}
+.coleccion{
+  flex:0 0 auto;padding:9px 15px;border:1px solid var(--linea);margin-right:-1px;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;
+  color:var(--texto-2);white-space:nowrap;
+}
+.coleccion[aria-pressed="true"]{background:var(--negro);color:var(--blanco);border-color:var(--negro);position:relative;z-index:1}
+
+.grid{display:grid;grid-template-columns:1fr;gap:24px;padding:0 var(--pad) 26px}
+@media(min-width:620px){.grid{grid-template-columns:1fr 1fr;gap:20px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+.ficha{border:1px solid var(--linea);display:flex;flex-direction:column;text-align:left;width:100%}
+.ficha .foto{
+  aspect-ratio:4/3;background:var(--negro);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.ficha .foto img{width:100%;height:100%;object-fit:cover;display:block}
+/* Placeholder mientras no haya fotos: bloque negro con marco fino dorado.
+   No dibuja ningún símbolo, porque el logo todavía no existe. */
+.ficha .foto .sin-foto{
+  border:1px solid rgba(201,162,74,.3);padding:14px 18px;
+  font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.32);
+}
+.ficha .datos{padding:18px 18px 16px;flex:1;display:flex;flex-direction:column}
+.ficha .datos h3{font-family:var(--serif);font-weight:700;font-size:19px;
+  letter-spacing:.02em;line-height:1.25;margin:0}
+.ficha .datos .sub{font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--texto-3);margin:7px 0 0;line-height:1.5}
+.ficha .meta{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  border-top:1px solid var(--linea-suave);margin-top:14px;padding-top:13px}
+.ficha .meta .tok{font-size:15px}
+.ficha .estado{font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--texto-3);font-weight:500;white-space:nowrap}
+.ficha.agotado .foto{opacity:.32}
+.ficha.agotado .estado{color:var(--err);font-weight:600}
+
+/* ==========================================================================
+   AVISOS Y ESTADOS VACÍOS
+   ========================================================================== */
+.aviso{padding:13px 15px;font-size:12.5px;line-height:1.6;margin:16px 0;border-left:2px solid}
+.aviso.err{background:var(--err-bg);color:var(--err);border-color:var(--err)}
+.aviso.avi{background:var(--avi-bg);color:var(--avi);border-color:var(--avi)}
+.aviso.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.aviso.neu{background:var(--neu-bg);color:var(--neu);border-color:var(--neu)}
+
+.vacio{text-align:center;padding:60px var(--pad)}
+.vacio .ico{font-size:26px;color:var(--linea);margin-bottom:16px}
+.vacio p{margin:0 0 20px;font-size:12px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--texto-3);font-weight:500}
+.vacio .btn-sm{margin:0 auto}
+.cargando{text-align:center;padding:48px var(--pad);font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--texto-3);font-weight:500}
+
+/* ==========================================================================
+   CARRITO
+   ========================================================================== */
+.renglon{display:flex;gap:14px;align-items:center;border-bottom:1px solid var(--linea-suave);padding:16px 0}
+.renglon:first-child{border-top:1px solid var(--linea-suave)}
+.renglon .info{flex:1;min-width:0}
+.renglon .info h4{font-family:var(--serif);font-weight:700;font-size:16px;margin:0;line-height:1.25}
+.renglon .info .sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--texto-3);margin-top:5px}
+.renglon .info .tok{font-size:13px;margin-top:6px}
+.cant{display:flex;align-items:center;border:1px solid var(--linea)}
+.cant button{width:32px;height:32px;font-size:15px;font-weight:500;color:var(--texto)}
+.cant button:disabled{opacity:.25}
+.cant .n{min-width:26px;text-align:center;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
+
+.cuenta{border-top:1px solid var(--negro);margin-top:22px;padding-top:16px}
+.cuenta .linea{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0}
+.cuenta .linea .rotulo{color:var(--texto-2)}
+.cuenta .linea.total{border-top:1px solid var(--linea);margin-top:10px;padding-top:14px}
+.cuenta .linea.total .rotulo{color:var(--texto);font-weight:600}
+.cuenta .linea.total .tok{font-size:20px}
+
+/* ==========================================================================
+   PEDIDOS
+   ========================================================================== */
+.pedido{border:1px solid var(--linea);margin-bottom:16px}
+.pedido .cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 18px 14px}
+.pedido .cab .num{font-family:var(--serif);font-weight:700;font-size:18px;line-height:1}
+.pedido .cab .fecha{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--texto-3);margin-top:7px;font-weight:500}
+.marca-estado{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  padding:5px 9px;border:1px solid currentColor;white-space:nowrap}
+.marca-estado.e-neu{color:var(--texto-2)}
+.marca-estado.e-ok{color:var(--ok)}
+.marca-estado.e-avi{color:var(--avi)}
+.marca-estado.e-err{color:var(--err)}
+.pedido .items{border-top:1px solid var(--linea-suave);padding:14px 18px;font-size:12px}
+.pedido .items div{display:flex;justify-content:space-between;gap:12px;padding:3px 0;color:var(--texto-2)}
+.pedido .items div .cifra{color:var(--texto)}
+.pedido .pie{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  border-top:1px solid var(--linea-suave);padding:14px 18px}
+.pedido .pie .tok{font-size:16px}
+.pedido .nota{border-top:1px solid var(--linea-suave);padding:12px 18px;
+  font-size:11.5px;color:var(--texto-3);font-style:italic}
+
+/* ==========================================================================
+   TOKENS
+   ========================================================================== */
+.panel-saldo{background:var(--negro);color:var(--blanco);padding:34px 22px;text-align:center;margin-bottom:26px}
+.panel-saldo .rotulo{color:#9a9a9a}
+.panel-saldo .monto{display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:42px;font-weight:600;letter-spacing:-.02em;margin-top:10px;
+  color:var(--dorado);font-variant-numeric:tabular-nums}
+.panel-saldo .monto .ico{width:.62em;height:.62em}
+.panel-saldo .unidad{font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;
+  color:#9a9a9a;margin-top:10px;font-weight:500}
+
+.bloque{border:1px solid var(--linea);padding:20px;margin-bottom:22px}
+.bloque h3{font-family:var(--serif);font-weight:700;font-size:17px;margin:0 0 6px}
+.bloque .bajada{font-size:12px;color:var(--texto-3);line-height:1.6;margin:0 0 16px}
+.canje{display:flex;gap:0}
+.canje input{flex:1;text-transform:uppercase;letter-spacing:.14em;font-weight:600;border-right:none}
+.canje .btn{width:auto;padding:13px 20px;flex:0 0 auto}
+
+.mov{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--linea-suave)}
+.mov:last-child{border-bottom:none}
+.mov .signo{width:28px;height:28px;border:1px solid currentColor;display:flex;
+  align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:0 0 auto}
+.mov .signo.mas{color:var(--ok)}
+.mov .signo.menos{color:var(--texto-2)}
+.mov .info{flex:1;min-width:0}
+.mov .info .q{font-size:12.5px;font-weight:500}
+.mov .info .f{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--texto-3);margin-top:3px;line-height:1.5}
+.mov .n{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mov .n.mas{color:var(--ok)}
+.mov .n.menos{color:var(--texto)}
+
+/* ==========================================================================
+   PEDIDO CONFIRMADO
+   ========================================================================== */
+#s-exito .sello{
+  width:92px;height:92px;margin:44px auto 26px;border:1px solid var(--dorado-oscuro);
+  display:flex;align-items:center;justify-content:center;color:var(--dorado-oscuro);
+  animation:aparecer .4s ease-out;
+}
+#s-exito .sello .ico{width:34px;height:34px}
+@keyframes aparecer{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+#s-exito .centro{text-align:center;padding:0 var(--pad)}
+#s-exito h2{font-family:var(--serif);font-weight:700;font-size:22px;
+  letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;margin:0}
+#s-exito .num{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--texto-3);margin-top:12px;font-weight:500}
+#s-exito .detalle{border:1px solid var(--linea);padding:18px;margin:28px 0 24px;text-align:left}
+#s-exito .detalle .linea{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0}
+#s-exito .detalle .linea .rotulo{color:var(--texto-2)}
+
+/* ==========================================================================
+   NAVEGACIÓN INFERIOR
+   ========================================================================== */
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:var(--blanco);border-top:1px solid var(--linea);
+  display:flex;padding-bottom:env(safe-area-inset-bottom,0px);
+}
+nav button{
+  flex:1;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  color:var(--texto-3);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:500;position:relative;
+}
+nav button .ico{width:19px;height:19px}
+nav button[aria-current="page"]{color:var(--texto)}
+nav button[aria-current="page"]::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--negro)}
+nav .contador{
+  position:absolute;top:11px;left:50%;margin-left:6px;
+  background:var(--dorado-oscuro);color:var(--blanco);
+  font-size:9px;font-weight:600;min-width:16px;height:16px;
+  display:none;align-items:center;justify-content:center;padding:0 4px;
+}
+
+/* ==========================================================================
+   MODALES
+   ========================================================================== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;
+  display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+@media(min-width:620px){.overlay.open{align-items:center}}
+.hoja{background:var(--blanco);width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
+  padding-bottom:env(safe-area-inset-bottom,0px);animation:subir .24s ease-out}
+@media(min-width:620px){.hoja{margin:20px;animation:none}}
+@keyframes subir{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.hoja .foto-modal{aspect-ratio:16/9;background:var(--negro);display:flex;
+  align-items:center;justify-content:center;overflow:hidden}
+.hoja .foto-modal img{width:100%;height:100%;object-fit:cover}
+.hoja .foto-modal .sin-foto{border:1px solid rgba(201,162,74,.3);padding:12px 16px;
+  font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.32)}
+.hoja .cuerpo{padding:22px var(--pad) 20px}
+.hoja h2{font-family:var(--serif);font-weight:700;font-size:22px;margin:0;line-height:1.2}
+.hoja .sub{font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--texto-3);margin:9px 0 0}
+.hoja .desc{font-size:13px;color:var(--texto-2);line-height:1.65;margin:16px 0 0}
+.hoja .fila-precio{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  padding:16px 0;margin:20px 0}
+.hoja .fila-precio .tok{font-size:17px}
+.hoja .fila-precio .disp{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--texto-3);margin-top:5px;font-weight:500}
+.hoja .acciones{display:flex;gap:10px;margin-top:12px}
+.hoja .acciones .btn{flex:1}
+
+/* ===== Aviso flotante ===== */
+#toast{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(16px);
+  bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px));
+  background:var(--negro);color:var(--blanco);
+  padding:13px 20px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:500;z-index:70;opacity:0;pointer-events:none;transition:.22s;
+  max-width:86%;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== Cinta de modo demo ===== */
+#cinta-demo{background:var(--avi-bg);color:var(--avi);text-align:center;
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:6px}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ===== ÍCONOS VECTORIALES =====
+     Dibujados acá adentro. Sin emojis: la marca los descarta por completo. -->
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-token" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+    <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.6"/>
+  </symbol>
+  <symbol id="i-catalogo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="3" y="3" width="7.5" height="7.5"/><rect x="13.5" y="3" width="7.5" height="7.5"/>
+    <rect x="3" y="13.5" width="7.5" height="7.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5"/>
+  </symbol>
+  <symbol id="i-carrito" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M5 7h14l-1.2 12.5H6.2L5 7Z"/><path d="M8.8 7V5.4a3.2 3.2 0 0 1 6.4 0V7"/>
+  </symbol>
+  <symbol id="i-pedidos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M5.5 3h13v18l-3.25-2-3.25 2-3.25-2L5.5 21V3Z"/><path d="M9 8.5h6M9 12.5h6"/>
+  </symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+    <path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>
+  </symbol>
+  <symbol id="i-vacio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+    <rect x="3.5" y="3.5" width="17" height="17"/><path d="M3.5 3.5 20.5 20.5"/>
+  </symbol>
+</svg>
+
+<!-- =========================== LOGIN =========================== -->
+<div id="login">
+  <div class="marco">
+    <div class="cabecera">
+      <div class="idioma-pos">
+        <div class="idioma" id="idioma-login">
+          <button data-idioma="es" aria-pressed="true"><span>ES</span></button>
+          <button data-idioma="en" aria-pressed="false"><span>EN</span></button>
+        </div>
+      </div>
+      <div class="hueco-logo"><span data-t="logo_hueco">Espacio reservado</span></div>
+      <div class="marca">
+        <h1 class="nombre" id="marca-nombre">CLUB</h1>
+        <p class="bajada" data-t="panel_socios">Panel de socios</p>
+      </div>
+    </div>
+
+    <div class="form">
+      <div id="login-error"></div>
+      <div class="campo">
+        <label for="in-usuario" data-t="usuario">Usuario</label>
+        <input id="in-usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" data-tph="usuario_ph">
+      </div>
+      <div class="campo">
+        <label for="in-pass" data-t="contrasena">Contraseña</label>
+        <input id="in-pass" type="password" autocomplete="current-password" data-tph="contrasena_ph">
+      </div>
+      <button class="btn" id="btn-entrar" data-t="entrar">Entrar</button>
+    </div>
+
+    <div class="legal" id="login-ayuda"></div>
+  </div>
+</div>
+
+<!-- =========================== APP =========================== -->
+<div id="app">
+
+  <div id="cinta-demo" data-t="cinta_demo">Modo demo</div>
+
+  <header>
+    <div class="fila">
+      <div class="quien">
+        <div class="club" id="h-club">CLUB</div>
+        <div class="nombre" id="h-nombre">—</div>
+      </div>
+      <div class="idioma" id="idioma-app">
+        <button data-idioma="es" aria-pressed="true"><span>ES</span></button>
+        <button data-idioma="en" aria-pressed="false"><span>EN</span></button>
+      </div>
+      <button class="salir" id="btn-salir" data-t="salir">Salir</button>
+    </div>
+    <div class="barra-saldo">
+      <div class="rotulo" data-t="tu_saldo">Tu saldo</div>
+      <div class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="h-saldo" class="cifra">0</span></div>
+    </div>
+  </header>
+
+  <!-- ---------- CATÁLOGO ---------- -->
+  <div class="screen active" id="s-catalogo">
+    <div class="colecciones" id="colecciones"></div>
+    <div class="titulo-sec" id="titulo-coleccion"><h1></h1><p></p></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- ---------- CARRITO ---------- -->
+  <div class="screen" id="s-carrito">
+    <div class="titulo-sec"><h1 data-t="tu_pedido">Tu pedido</h1></div>
+    <div class="pad" id="carrito-cont"></div>
+  </div>
+
+  <!-- ---------- PEDIDOS ---------- -->
+  <div class="screen" id="s-pedidos">
+    <div class="titulo-sec"><h1 data-t="mis_pedidos">Mis pedidos</h1></div>
+    <div class="pad" id="pedidos-cont"></div>
+  </div>
+
+  <!-- ---------- TOKENS ---------- -->
+  <div class="screen" id="s-tokens">
+    <div class="titulo-sec"><h1 data-t="mis_tokens">Mis tokens</h1></div>
+
+    <div class="pad">
+      <div class="panel-saldo">
+        <div class="rotulo" data-t="saldo_disponible">Saldo disponible</div>
+        <div class="monto"><svg class="ico"><use href="#i-token"/></svg><span id="t-saldo">0</span></div>
+        <div class="unidad" data-t="tokens_unidad">Tokens</div>
+      </div>
+
+      <div class="bloque">
+        <h3 data-t="canjear_codigo">Canjear un código</h3>
+        <p class="bajada" data-t="canjear_bajada"></p>
+        <div class="canje">
+          <input id="in-codigo" type="text" autocapitalize="characters" spellcheck="false" data-tph="codigo_ph">
+          <button class="btn" id="btn-canjear" data-t="canjear">Canjear</button>
+        </div>
+        <div id="canje-msg"></div>
+      </div>
+
+      <div class="bloque">
+        <h3 data-t="movimientos">Movimientos</h3>
+        <p class="bajada" data-t="movimientos_bajada"></p>
+        <div id="movs-cont"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- PEDIDO CONFIRMADO ---------- -->
+  <div class="screen" id="s-exito">
+    <div class="sello"><svg class="ico"><use href="#i-tick"/></svg></div>
+    <div class="centro">
+      <h2 data-t="pedido_confirmado">Pedido confirmado</h2>
+      <div class="num" id="exito-num"></div>
+      <div class="detalle">
+        <div class="linea"><span class="rotulo" data-t="total_pedido">Total del pedido</span>
+          <span class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="exito-total"></span></span></div>
+        <div class="linea"><span class="rotulo" data-t="saldo_restante">Saldo restante</span>
+          <span class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="exito-saldo"></span></span></div>
+      </div>
+      <button class="btn" onclick="ir('pedidos')" data-t="ver_pedidos">Ver mis pedidos</button>
+      <button class="btn btn-sec" style="margin-top:10px;margin-bottom:30px" onclick="ir('catalogo')" data-t="volver_catalogo">Volver al catálogo</button>
+    </div>
+  </div>
+
+  <nav>
+    <button data-nav="catalogo" aria-current="page" onclick="ir('catalogo')">
+      <svg class="ico"><use href="#i-catalogo"/></svg><span data-t="nav_catalogo">Catálogo</span></button>
+    <button data-nav="carrito" onclick="ir('carrito')">
+      <svg class="ico"><use href="#i-carrito"/></svg><span data-t="nav_carrito">Carrito</span>
+      <span class="contador" id="contador">0</span></button>
+    <button data-nav="pedidos" onclick="ir('pedidos')">
+      <svg class="ico"><use href="#i-pedidos"/></svg><span data-t="nav_pedidos">Pedidos</span></button>
+    <button data-nav="tokens" onclick="ir('tokens')">
+      <svg class="ico"><use href="#i-token"/></svg><span data-t="nav_tokens">Tokens</span></button>
+  </nav>
+</div>
+
+<!-- ===== MODAL DE PRODUCTO ===== -->
+<div class="overlay" id="modal-prod">
+  <div class="hoja">
+    <div class="foto-modal" id="mp-foto"></div>
+    <div class="cuerpo">
+      <h2 id="mp-nombre"></h2>
+      <p class="sub" id="mp-sub"></p>
+      <div class="fila-precio">
+        <div>
+          <div class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="mp-precio"></span></div>
+          <div class="disp" id="mp-stock"></div>
+        </div>
+        <div class="cant">
+          <button id="mp-menos" aria-label="−">−</button>
+          <div class="n" id="mp-qty">1</div>
+          <button id="mp-mas" aria-label="+">+</button>
+        </div>
+      </div>
+      <div id="mp-aviso"></div>
+      <button class="btn" id="mp-agregar"></button>
+      <button class="btn btn-linea" style="margin-top:10px" onclick="cerrarModal('modal-prod')" data-t="cancelar">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE CONFIRMACIÓN ===== -->
+<div class="overlay" id="modal-confirm">
+  <div class="hoja">
+    <div class="cuerpo">
+      <h2 id="mc-titulo"></h2>
+      <p class="desc" id="mc-texto"></p>
+      <div class="acciones">
+        <button class="btn btn-linea" onclick="cerrarModal('modal-confirm')" data-t="no">No</button>
+        <button class="btn" id="mc-si" data-t="si">Sí</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ==========================================================================
+   CONFIGURACIÓN
+   ========================================================================== */
+var SUPABASE_URL = "https://xndnbdffstwllpdjdjbz.supabase.co";
+var SUPABASE_KEY = "sb_publishable_g-LPINzTTbu7dcgu98PR4w_mL6vGU4v";
+var MODO_DEMO    = false;
+
+var CLUB_NOMBRE  = "CLUB"; // placeholder hasta que la ONG defina el nombre
+
+
+/* ==========================================================================
+   TEXTOS — DICCIONARIO ÚNICO
+   Todo texto de interfaz vive acá, en los dos idiomas. Ni una palabra suelta
+   en el HTML. Si mañana hay que corregir algo o sumar un tercer idioma, se
+   toca este bloque y nada más.
+
+   Lo que NO se traduce: nombres y descripciones de productos. Eso vive en la
+   base de datos y traducirlo obligaría al club a cargar cada producto dos
+   veces. Decisión tomada.
+
+   {0} es un hueco que se reemplaza con un valor al momento de mostrarlo.
+   ========================================================================== */
+var TEXTOS = {
+  es: {
+    /* --- Marca y login --- */
+    logo_hueco:"Espacio reservado",
+    panel_socios:"Panel de socios",
+    usuario:"Usuario",            usuario_ph:"Tu usuario",
+    contrasena:"Contraseña",      contrasena_ph:"Tu contraseña",
+    entrar:"Entrar",
+    entrando:"Entrando…",
+    err_campos:"Completá usuario y contraseña.",
+    err_credenciales:"Usuario o contraseña incorrectos.",
+    err_inactivo:"Tu cuenta no está activa. Consultá en el club.",
+    err_conexion:"No se pudo conectar. Probá de nuevo en un momento.",
+    demo_ayuda:"Modo demo. Probá con <b>martin / 1234</b> o <b>carla / 1234</b>.<br>Códigos para canjear: <b>PRUEBA100</b> · <b>VERANO250</b>",
+    cinta_demo:"Modo demo — los datos no se guardan",
+
+    /* --- Cabecera --- */
+    tu_saldo:"Tu saldo",
+    salir:"Salir",
+    salir_titulo:"Cerrar sesión",
+    salir_texto:"¿Querés salir de tu cuenta?",
+
+    /* --- Navegación --- */
+    nav_catalogo:"Catálogo", nav_carrito:"Carrito",
+    nav_pedidos:"Pedidos",   nav_tokens:"Tokens",
+
+    /* --- Catálogo --- */
+    piezas:"{0} productos",
+    pieza:"{0} producto",
+    disponible:"Disponible",
+    quedan:"Quedan {0}",
+    no_disponible:"No disponible",
+    sin_foto:"Sin imagen",
+    cargando:"Cargando",
+    err_catalogo:"No se pudo cargar el catálogo.",
+    coleccion_vacia:"No hay productos en esta colección.",
+    unidades_disp:"{0} disponibles",
+    unidad_disp:"1 disponible",
+    agotado_texto:"Este producto no está disponible en este momento.",
+    saldo_no_alcanza:"Con tu saldo no alcanza para esta cantidad. Te quedan {0} tokens libres.",
+    agregar:"Agregar — {0} tokens",
+    agregado:"{0} × {1} en tu pedido",
+    cancelar:"Cancelar",
+
+    /* --- Carrito --- */
+    tu_pedido:"Tu pedido",
+    carrito_vacio:"Todavía no agregaste nada",
+    ver_catalogo:"Ver el catálogo",
+    cada_uno:"{0} tokens c/u",
+    saldo:"Tu saldo",
+    total:"Total",
+    faltan:"Te faltan <b>{0} tokens</b> para este pedido. Sacá algo del pedido o cargá tokens en el club.",
+    pedidos_pausados:"Los pedidos están pausados por el club en este momento.",
+    quedaran:"Te van a quedar <b>{0} tokens</b> después de confirmar.",
+    nota_label:"Nota para el club (opcional)",
+    nota_ph:"Algo que quieras aclarar sobre el pedido",
+    confirmar_pedido:"Confirmar pedido — {0} tokens",
+    confirmando:"Confirmando…",
+    vaciar:"Vaciar el pedido",
+    vaciar_titulo:"Vaciar el pedido",
+    vaciar_texto:"Se van a sacar todos los productos que agregaste.",
+    err_saldo_cambio:"Tu saldo cambió y ya no alcanza",
+    err_sin_stock:"Sin stock: {0}",
+    err_confirmar:"No se pudo confirmar el pedido. Probá de nuevo.",
+
+    /* --- Pedido confirmado --- */
+    pedido_confirmado:"Pedido confirmado",
+    numero:"Número {0}",
+    total_pedido:"Total del pedido",
+    saldo_restante:"Saldo restante",
+    ver_pedidos:"Ver mis pedidos",
+    volver_catalogo:"Volver al catálogo",
+
+    /* --- Mis pedidos --- */
+    mis_pedidos:"Mis pedidos",
+    sin_pedidos:"Todavía no hiciste ningún pedido",
+    err_pedidos:"No se pudieron cargar tus pedidos.",
+    cancelar_pedido:"Cancelar",
+    cancelar_titulo:"Cancelar el pedido {0}",
+    cancelar_texto:"Se te devuelven {0} tokens a tu cuenta.",
+    cancelado_ok:"Pedido cancelado. Se devolvieron {0} tokens",
+    err_cancelar:"No se pudo cancelar el pedido",
+
+    /* --- Estados de pedido --- */
+    e_pendiente:"Pendiente",  e_preparando:"Preparando",
+    e_listo:"Listo para retirar", e_entregado:"Entregado", e_cancelado:"Cancelado",
+
+    /* --- Tokens --- */
+    mis_tokens:"Mis tokens",
+    saldo_disponible:"Saldo disponible",
+    tokens_unidad:"Tokens",
+    canjear_codigo:"Canjear un código",
+    canjear_bajada:"Si el club te dio un código de carga, escribilo acá para sumar los tokens a tu cuenta.",
+    canjear:"Canjear",
+    codigo_ph:"Código",
+    err_codigo_vacio:"Escribí un código.",
+    err_codigo_no_existe:"Ese código no existe. Revisá que esté bien escrito.",
+    err_codigo_usado:"Ese código ya fue usado.",
+    err_codigo_vencido:"Ese código está vencido.",
+    err_canje:"No se pudo canjear el código. Probá de nuevo.",
+    canje_ok:"Se acreditaron <b>{0} tokens</b>.",
+    canje_toast:"+{0} tokens acreditados",
+    movimientos:"Movimientos",
+    movimientos_bajada:"Todo lo que entró y salió de tu cuenta.",
+    sin_movimientos:"Todavía no hay movimientos.",
+    err_movimientos:"No se pudo cargar el historial.",
+
+    /* --- Tipos de movimiento --- */
+    m_carga_presencial:"Carga en el local",
+    m_canje_codigo:"Código canjeado",
+    m_ajuste_admin:"Ajuste del club",
+    m_consumo_pedido:"Pedido",
+    m_devolucion_pedido:"Pedido cancelado",
+
+    /* --- Colecciones (etiquetas de interfaz, no contenido de la base) --- */
+    c_flores:"Flores", c_hash:"Hash", c_comestibles:"Comestibles",
+    c_accesorios:"Accesorios", c_merch:"Merch",
+
+    /* --- Generales --- */
+    si:"Sí", no:"No", hoy:"Hoy",
+    pedido_ref:"Pedido {0}"
+  },
+
+  en: {
+    logo_hueco:"Reserved space",
+    panel_socios:"Member panel",
+    usuario:"Username",           usuario_ph:"Your username",
+    contrasena:"Password",        contrasena_ph:"Your password",
+    entrar:"Sign in",
+    entrando:"Signing in…",
+    err_campos:"Enter your username and password.",
+    err_credenciales:"Incorrect username or password.",
+    err_inactivo:"Your account is not active. Please ask at the club.",
+    err_conexion:"Connection failed. Please try again in a moment.",
+    demo_ayuda:"Demo mode. Try <b>martin / 1234</b> or <b>carla / 1234</b>.<br>Codes to redeem: <b>PRUEBA100</b> · <b>VERANO250</b>",
+    cinta_demo:"Demo mode — data is not saved",
+
+    tu_saldo:"Your balance",
+    salir:"Sign out",
+    salir_titulo:"Sign out",
+    salir_texto:"Do you want to sign out of your account?",
+
+    nav_catalogo:"Catalog", nav_carrito:"Cart",
+    nav_pedidos:"Orders",   nav_tokens:"Tokens",
+
+    piezas:"{0} products",
+    pieza:"{0} product",
+    disponible:"Available",
+    quedan:"{0} left",
+    no_disponible:"Unavailable",
+    sin_foto:"No image",
+    cargando:"Loading",
+    err_catalogo:"The catalog could not be loaded.",
+    coleccion_vacia:"No products in this collection.",
+    unidades_disp:"{0} available",
+    unidad_disp:"1 available",
+    agotado_texto:"This product is unavailable at the moment.",
+    saldo_no_alcanza:"Your balance does not cover this quantity. You have {0} tokens left.",
+    agregar:"Add — {0} tokens",
+    agregado:"{0} × {1} added to your order",
+    cancelar:"Cancel",
+
+    tu_pedido:"Your order",
+    carrito_vacio:"You have not added anything yet",
+    ver_catalogo:"Browse the catalog",
+    cada_uno:"{0} tokens each",
+    saldo:"Your balance",
+    total:"Total",
+    faltan:"You need <b>{0} more tokens</b> for this order. Remove an item or top up at the club.",
+    pedidos_pausados:"Orders are paused by the club at the moment.",
+    quedaran:"You will have <b>{0} tokens</b> left after confirming.",
+    nota_label:"Note for the club (optional)",
+    nota_ph:"Anything you want to add about this order",
+    confirmar_pedido:"Confirm order — {0} tokens",
+    confirmando:"Confirming…",
+    vaciar:"Empty the order",
+    vaciar_titulo:"Empty the order",
+    vaciar_texto:"Every product you added will be removed.",
+    err_saldo_cambio:"Your balance changed and no longer covers this",
+    err_sin_stock:"Out of stock: {0}",
+    err_confirmar:"The order could not be confirmed. Please try again.",
+
+    pedido_confirmado:"Order confirmed",
+    numero:"Number {0}",
+    total_pedido:"Order total",
+    saldo_restante:"Remaining balance",
+    ver_pedidos:"View my orders",
+    volver_catalogo:"Back to the catalog",
+
+    mis_pedidos:"My orders",
+    sin_pedidos:"You have not placed any orders yet",
+    err_pedidos:"Your orders could not be loaded.",
+    cancelar_pedido:"Cancel",
+    cancelar_titulo:"Cancel order {0}",
+    cancelar_texto:"{0} tokens will be returned to your account.",
+    cancelado_ok:"Order cancelled. {0} tokens returned",
+    err_cancelar:"The order could not be cancelled",
+
+    e_pendiente:"Pending",  e_preparando:"In preparation",
+    e_listo:"Ready for pickup", e_entregado:"Delivered", e_cancelado:"Cancelled",
+
+    mis_tokens:"My tokens",
+    saldo_disponible:"Available balance",
+    tokens_unidad:"Tokens",
+    canjear_codigo:"Redeem a code",
+    canjear_bajada:"If the club gave you a top-up code, enter it here to add the tokens to your account.",
+    canjear:"Redeem",
+    codigo_ph:"Code",
+    err_codigo_vacio:"Enter a code.",
+    err_codigo_no_existe:"That code does not exist. Check the spelling.",
+    err_codigo_usado:"That code has already been used.",
+    err_codigo_vencido:"That code has expired.",
+    err_canje:"The code could not be redeemed. Please try again.",
+    canje_ok:"<b>{0} tokens</b> have been added.",
+    canje_toast:"+{0} tokens added",
+    movimientos:"Activity",
+    movimientos_bajada:"Everything that came in and out of your account.",
+    sin_movimientos:"No activity yet.",
+    err_movimientos:"The activity could not be loaded.",
+
+    m_carga_presencial:"Top-up at the club",
+    m_canje_codigo:"Code redeemed",
+    m_ajuste_admin:"Club adjustment",
+    m_consumo_pedido:"Order",
+    m_devolucion_pedido:"Order cancelled",
+
+    c_flores:"Flower", c_hash:"Hash", c_comestibles:"Edibles",
+    c_accesorios:"Accessories", c_merch:"Merch",
+
+    si:"Yes", no:"No", hoy:"Today",
+    pedido_ref:"Order {0}"
+  }
+};
+
+var IDIOMA = "es";
+var CLAVE_IDIOMA = "club_idioma";
+
+/* t() devuelve el texto en el idioma activo y reemplaza los huecos {0}, {1}… */
+function t(clave){
+  var txt = (TEXTOS[IDIOMA] && TEXTOS[IDIOMA][clave]);
+  if (txt === undefined) txt = (TEXTOS.es[clave] !== undefined ? TEXTOS.es[clave] : clave);
+  for (var i = 1; i < arguments.length; i++) {
+    txt = txt.split("{" + (i - 1) + "}").join(arguments[i]);
+  }
+  return txt;
+}
+
+
+/* ==========================================================================
+   DATOS DE DEMO — espejo exacto de 03_ESQUEMA_BD.sql
+   ========================================================================== */
+function _hace(dias, horas){
+  var d = new Date();
+  d.setDate(d.getDate() - (dias || 0));
+  d.setHours(d.getHours() - (horas || 0));
+  return d.toISOString();
+}
+
+var DEMO = {
+  configuracion: [
+    { id:1, clave:"club_nombre",        valor:"CLUB" },
+    { id:2, clave:"mensaje_bienvenida", valor:"Bienvenido" },
+    { id:3, clave:"pedidos_activos",    valor:"true" }
+  ],
+
+  socios: [
+    { id:1, nombre:"Martín", apellido:"Álvarez", usuario:"martin", password:"1234", email:"martin@ejemplo.com", telefono:"11 5555-1111", saldo_tokens:850, estado:"activo" },
+    { id:2, nombre:"Carla",  apellido:"Duarte",  usuario:"carla",  password:"1234", email:"carla@ejemplo.com",  telefono:"11 5555-2222", saldo_tokens:60,  estado:"activo" },
+    { id:3, nombre:"Diego",  apellido:"Ferrer",  usuario:"diego",  password:"1234", email:"diego@ejemplo.com",  telefono:"11 5555-3333", saldo_tokens:200, estado:"inactivo" }
+  ],
+
+  productos: [
+    { id:1,  nombre:"Flor Índica",      descripcion:"Variedad relajante. Efecto corporal, ideal para la noche.", categoria:"flores",      precio_tokens:120, stock:25, activo:true, orden:1, imagen_url:null },
+    { id:2,  nombre:"Flor Sativa",      descripcion:"Variedad energizante. Efecto mental, ideal para el día.",   categoria:"flores",      precio_tokens:120, stock:18, activo:true, orden:2, imagen_url:null },
+    { id:3,  nombre:"Flor Híbrida",     descripcion:"Balance entre efecto corporal y mental.",                   categoria:"flores",      precio_tokens:130, stock:12, activo:true, orden:3, imagen_url:null },
+    { id:4,  nombre:"Flor Premium",     descripcion:"Selección especial de cultivo interior.",                   categoria:"flores",      precio_tokens:180, stock:0,  activo:true, orden:4, imagen_url:null },
+    { id:5,  nombre:"Hash Tradicional", descripcion:"Prensado artesanal, textura maleable.",                     categoria:"hash",        precio_tokens:200, stock:10, activo:true, orden:1, imagen_url:null },
+    { id:6,  nombre:"Hash Premium",     descripcion:"Extracción en frío, alta pureza.",                          categoria:"hash",        precio_tokens:320, stock:5,  activo:true, orden:2, imagen_url:null },
+    { id:7,  nombre:"Brownie",          descripcion:"Porción individual. Efecto prolongado.",                    categoria:"comestibles", precio_tokens:90,  stock:15, activo:true, orden:1, imagen_url:null },
+    { id:8,  nombre:"Galletitas x3",    descripcion:"Pack de tres unidades.",                                    categoria:"comestibles", precio_tokens:110, stock:8,  activo:true, orden:2, imagen_url:null },
+    { id:9,  nombre:"Gomitas x10",      descripcion:"Pack de diez unidades, dosis baja por unidad.",             categoria:"comestibles", precio_tokens:150, stock:20, activo:true, orden:3, imagen_url:null },
+    { id:10, nombre:"Aceite 10ml",      descripcion:"Gotero con dosificador.",                                   categoria:"comestibles", precio_tokens:400, stock:4,  activo:true, orden:4, imagen_url:null },
+    { id:11, nombre:"Grinder metálico", descripcion:"Cuatro partes, con recolector.",                            categoria:"accesorios",  precio_tokens:160, stock:12, activo:true, orden:1, imagen_url:null },
+    { id:12, nombre:"Papelillos",       descripcion:"Caja de 50 unidades.",                                      categoria:"accesorios",  precio_tokens:25,  stock:60, activo:true, orden:2, imagen_url:null },
+    { id:13, nombre:"Filtros",          descripcion:"Pack de 100 unidades.",                                     categoria:"accesorios",  precio_tokens:20,  stock:45, activo:true, orden:3, imagen_url:null },
+    { id:14, nombre:"Bandeja",          descripcion:"Bandeja metálica mediana.",                                 categoria:"accesorios",  precio_tokens:90,  stock:7,  activo:true, orden:4, imagen_url:null },
+    { id:15, nombre:"Remera del club",  descripcion:"Algodón, talles S al XL.",                                  categoria:"merch",       precio_tokens:350, stock:9,  activo:true, orden:1, imagen_url:null },
+    { id:16, nombre:"Gorra",            descripcion:"Bordado frontal.",                                          categoria:"merch",       precio_tokens:280, stock:6,  activo:true, orden:2, imagen_url:null },
+    { id:17, nombre:"Buzo",             descripcion:"Con capucha, talles S al XL.",                              categoria:"merch",       precio_tokens:600, stock:0,  activo:true, orden:3, imagen_url:null },
+    { id:18, nombre:"Sticker pack",     descripcion:"Set de seis stickers.",                                     categoria:"merch",       precio_tokens:40,  stock:30, activo:true, orden:4, imagen_url:null }
+  ],
+
+  pedidos: [
+    { id:1, socio_id:1, socio_nombre:"Martín Álvarez", total_tokens:265, estado:"entregado", created_at:_hace(12), entregado_en:_hace(11), nota:null,
+      items:[ {producto_id:1, nombre:"Flor Índica", cantidad:2, precio_tokens:120, subtotal:240},
+              {producto_id:12, nombre:"Papelillos", cantidad:1, precio_tokens:25, subtotal:25} ] },
+    { id:2, socio_id:1, socio_nombre:"Martín Álvarez", total_tokens:270, estado:"listo", created_at:_hace(2), entregado_en:null, nota:null,
+      items:[ {producto_id:7, nombre:"Brownie", cantidad:3, precio_tokens:90, subtotal:270} ] },
+    { id:3, socio_id:1, socio_nombre:"Martín Álvarez", total_tokens:160, estado:"pendiente", created_at:_hace(0,4), entregado_en:null, nota:null,
+      items:[ {producto_id:11, nombre:"Grinder metálico", cantidad:1, precio_tokens:160, subtotal:160} ] },
+    { id:4, socio_id:2, socio_nombre:"Carla Duarte", total_tokens:40, estado:"preparando", created_at:_hace(1), entregado_en:null, nota:null,
+      items:[ {producto_id:13, nombre:"Filtros", cantidad:2, precio_tokens:20, subtotal:40} ] }
+  ],
+
+  movimientos_tokens: [
+    { id:1, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"carga_presencial", cantidad:500,  saldo_resultante:500,  referencia:null, referencia_id:null, created_at:_hace(20) },
+    { id:2, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"canje_codigo",     cantidad:300,  saldo_resultante:800,  referencia:"BIENVENIDO", referencia_id:null, created_at:_hace(15) },
+    { id:3, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_pedido",   cantidad:-265, saldo_resultante:535,  referencia:null, referencia_id:1, created_at:_hace(12) },
+    { id:4, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"carga_presencial", cantidad:745,  saldo_resultante:1280, referencia:null, referencia_id:null, created_at:_hace(5) },
+    { id:5, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_pedido",   cantidad:-270, saldo_resultante:1010, referencia:null, referencia_id:2, created_at:_hace(2) },
+    { id:6, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_pedido",   cantidad:-160, saldo_resultante:850,  referencia:null, referencia_id:3, created_at:_hace(0,4) },
+    { id:7, socio_id:2, socio_nombre:"Carla Duarte",   tipo:"carga_presencial", cantidad:100,  saldo_resultante:100,  referencia:null, referencia_id:null, created_at:_hace(6) },
+    { id:8, socio_id:2, socio_nombre:"Carla Duarte",   tipo:"consumo_pedido",   cantidad:-40,  saldo_resultante:60,   referencia:null, referencia_id:4, created_at:_hace(1) },
+    { id:9, socio_id:3, socio_nombre:"Diego Ferrer",   tipo:"carga_presencial", cantidad:200,  saldo_resultante:200,  referencia:null, referencia_id:null, created_at:_hace(30) }
+  ],
+
+  codigos_canje: [
+    { id:1, codigo:"PRUEBA100",  tokens:100, usado:false, usado_por:null, usado_en:null,      vence_en:null, descripcion:"Código de prueba" },
+    { id:2, codigo:"VERANO250",  tokens:250, usado:false, usado_por:null, usado_en:null,      vence_en:null, descripcion:"Promo de temporada" },
+    { id:3, codigo:"BIENVENIDO", tokens:300, usado:true,  usado_por:1,    usado_en:_hace(15), vence_en:null, descripcion:"Bienvenida — ya usado" }
+  ]
+};
+
+
+/* ==========================================================================
+   MOTOR DE CONSULTAS DEMO
+   Entiende el mismo formato de URL que Supabase (PostgREST). Por eso el
+   resto de la app no se entera de en qué modo está corriendo.
+   ========================================================================== */
+function _demoFiltrar(tabla, qs){
+  var rows = (DEMO[tabla] || []).slice();
+  if (!qs) return rows;
+
+  var orderBy = null, orderDir = "asc", limite = null;
+
+  qs.split("&").forEach(function(p){
+    if (!p) return;
+    var i = p.indexOf("=");
+    if (i < 0) return;
+    var campo = decodeURIComponent(p.slice(0, i));
+    var val = p.slice(i + 1);
+
+    if (campo === "select") return;
+    if (campo === "limit") { limite = parseInt(val, 10); return; }
+    if (campo === "order") {
+      var o = decodeURIComponent(val).split(".");
+      orderBy = o[0]; orderDir = o[1] || "asc";
+      return;
+    }
+
+    var punto = val.indexOf(".");
+    var op  = punto >= 0 ? val.slice(0, punto) : "eq";
+    var arg = decodeURIComponent(punto >= 0 ? val.slice(punto + 1) : val);
+
+    rows = rows.filter(function(r){
+      var v = r[campo];
+      if (op === "eq")  return String(v) === arg || (arg === "true" && v === true) || (arg === "false" && v === false);
+      if (op === "neq") return String(v) !== arg;
+      if (op === "gt")  return Number(v) >  Number(arg);
+      if (op === "gte") return Number(v) >= Number(arg);
+      if (op === "lt")  return Number(v) <  Number(arg);
+      if (op === "lte") return Number(v) <= Number(arg);
+      if (op === "in")  return arg.replace(/^\(|\)$/g, "").split(",").indexOf(String(v)) >= 0;
+      if (op === "is")  return arg === "null" ? (v === null || v === undefined) : true;
+      return true;
+    });
+  });
+
+  if (orderBy) {
+    rows.sort(function(a, b){
+      var x = a[orderBy], y = b[orderBy];
+      if (x === null || x === undefined) return 1;
+      if (y === null || y === undefined) return -1;
+      var cmp;
+      if (typeof x === "number" && typeof y === "number") cmp = x - y;
+      else if (String(x).indexOf("-") > 0 && !isNaN(new Date(x).getTime())) cmp = new Date(x) - new Date(y);
+      else cmp = x > y ? 1 : (x < y ? -1 : 0);
+      return orderDir === "desc" ? -cmp : cmp;
+    });
+  }
+  if (limite) rows = rows.slice(0, limite);
+  return rows;
+}
+
+/* ==========================================================================
+   sb() — ÚNICO PUNTO DE CONTACTO CON LA BASE
+   ========================================================================== */
+function sb(path, method, body){
+  method = method || "GET";
+
+  /* ----- Modo real: fetch a la API REST de Supabase ----- */
+  if (!MODO_DEMO) {
+    var opts = {
+      method: method,
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    return fetch(SUPABASE_URL + "/rest/v1/" + path, opts).then(function(r){
+      if (!r.ok) return r.text().then(function(txt){ throw new Error(txt || ("Error " + r.status)); });
+      if (r.status === 204) return [];
+      return r.json();
+    });
+  }
+
+  /* ----- Modo demo: se responde desde el objeto DEMO ----- */
+  var qi = path.indexOf("?");
+  var tabla = qi < 0 ? path : path.slice(0, qi);
+  var qs    = qi < 0 ? "" : path.slice(qi + 1);
+
+  return new Promise(function(resolve){
+    setTimeout(function(){
+      var rows = _demoFiltrar(tabla, qs);
+
+      if (method === "GET") { resolve(JSON.parse(JSON.stringify(rows))); return; }
+
+      if (method === "POST") {
+        var arr = Array.isArray(body) ? body : [body];
+        var creados = arr.map(function(o){
+          var nuevo = JSON.parse(JSON.stringify(o));
+          if (nuevo.id === undefined || nuevo.id === null) {
+            var max = (DEMO[tabla] || []).reduce(function(a, r){ return Math.max(a, Number(r.id) || 0); }, 0);
+            nuevo.id = max + 1;
+          }
+          if (!nuevo.created_at) nuevo.created_at = new Date().toISOString();
+          DEMO[tabla] = DEMO[tabla] || [];
+          DEMO[tabla].push(nuevo);
+          return nuevo;
+        });
+        resolve(JSON.parse(JSON.stringify(creados)));
+        return;
+      }
+
+      if (method === "PATCH") {
+        var act = [];
+        rows.forEach(function(r){
+          var real = DEMO[tabla].filter(function(x){ return String(x.id) === String(r.id); })[0];
+          if (real) {
+            Object.keys(body || {}).forEach(function(k){ real[k] = body[k]; });
+            act.push(real);
+          }
+        });
+        resolve(JSON.parse(JSON.stringify(act)));
+        return;
+      }
+
+      if (method === "DELETE") {
+        var ids = rows.map(function(r){ return String(r.id); });
+        DEMO[tabla] = DEMO[tabla].filter(function(x){ return ids.indexOf(String(x.id)) < 0; });
+        resolve([]);
+        return;
+      }
+
+      resolve([]);
+    }, 120);
+  });
+}
+
+
+/* ==========================================================================
+   ESTADO DE LA APP
+   ========================================================================== */
+var socio      = null;
+var productos  = [];
+var carrito    = [];
+var config     = {};
+var catActual  = null;
+var pantalla   = "catalogo";
+var modalProd  = null;
+var modalQty   = 1;
+var procesando = false;
+
+var ESTADO_CLASE = {
+  pendiente:"e-neu", preparando:"e-avi", listo:"e-ok",
+  entregado:"e-ok",  cancelado:"e-err"
+};
+
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+function $(id){ return document.getElementById(id); }
+
+/* Números: en español el separador de miles es el punto, en inglés la coma. */
+function num(n){ return Number(n || 0).toLocaleString(IDIOMA === "es" ? "es-AR" : "en-US"); }
+
+function nroPedido(id){ return "#" + String(id).padStart(4, "0"); }
+
+/* Precio en tokens. Un solo formato para toda la app: moneda + cifra. */
+function tokHTML(n, clase){
+  return '<span class="tok' + (clase ? " " + clase : "") + '">' +
+         '<svg class="ico"><use href="#i-token"/></svg>' +
+         '<span class="cifra">' + num(n) + '</span></span>';
+}
+
+/* Fechas: cada idioma las escribe distinto. */
+function fecha(iso){
+  if (!iso) return "";
+  var d = new Date(iso);
+  var hoy = new Date();
+  var hh = String(d.getHours()).padStart(2, "0");
+  var mm = String(d.getMinutes()).padStart(2, "0");
+
+  if (d.toDateString() === hoy.toDateString()) {
+    if (IDIOMA === "es") return t("hoy") + " " + hh + ":" + mm;
+    return t("hoy") + " " + d.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit" });
+  }
+  if (IDIOMA === "es") {
+    return String(d.getDate()).padStart(2,"0") + "/" + String(d.getMonth()+1).padStart(2,"0") +
+           "/" + d.getFullYear() + " " + hh + ":" + mm;
+  }
+  return d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" }) + " " +
+         d.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit" });
+}
+
+function esc(s){
+  return String(s === null || s === undefined ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+/* Etiqueta de una colección. Si la categoría no está en el diccionario
+   (por ejemplo, una nueva que cargó el admin), se muestra tal cual vino
+   de la base. Así nunca queda una colección sin nombre. */
+function etiquetaColeccion(cat){
+  var clave = "c_" + cat;
+  var txt = TEXTOS[IDIOMA][clave];
+  return txt !== undefined ? txt : cat;
+}
+
+function etiquetaEstado(e){ return t("e_" + e); }
+
+var toastId = null;
+function toast(msg){
+  var el = $("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastId);
+  toastId = setTimeout(function(){ el.classList.remove("show"); }, 2800);
+}
+
+function abrirModal(id){ $(id).classList.add("open"); }
+function cerrarModal(id){ $(id).classList.remove("open"); }
+
+var confirmCB = null;
+function confirmar(titulo, texto, cb){
+  $("mc-titulo").textContent = titulo;
+  $("mc-texto").textContent = texto;
+  confirmCB = cb;
+  abrirModal("modal-confirm");
+}
+$("mc-si").onclick = function(){
+  cerrarModal("modal-confirm");
+  if (confirmCB) confirmCB();
+  confirmCB = null;
+};
+
+["modal-prod","modal-confirm"].forEach(function(id){
+  $(id).addEventListener("click", function(e){ if (e.target === this) cerrarModal(id); });
+});
+
+
+/* ==========================================================================
+   IDIOMA
+   Se guarda en el celular del socio. Cambiarlo no recarga la página ni
+   toca el carrito: solo repinta lo que está en pantalla.
+   ========================================================================== */
+function cambiarIdioma(nuevo){
+  if (nuevo !== "es" && nuevo !== "en") return;
+  IDIOMA = nuevo;
+  try { localStorage.setItem(CLAVE_IDIOMA, nuevo); } catch(e){}
+  aplicarIdioma();
+}
+
+function aplicarIdioma(){
+  document.documentElement.lang = IDIOMA;
+
+  /* Textos fijos del HTML */
+  document.querySelectorAll("[data-t]").forEach(function(el){
+    el.innerHTML = t(el.getAttribute("data-t"));
+  });
+  document.querySelectorAll("[data-tph]").forEach(function(el){
+    el.setAttribute("placeholder", t(el.getAttribute("data-tph")));
+  });
+
+  /* Botones del selector */
+  document.querySelectorAll(".idioma button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.getAttribute("data-idioma") === IDIOMA ? "true" : "false");
+  });
+
+  document.title = CLUB_NOMBRE + " — " + t("panel_socios");
+  if (MODO_DEMO) $("login-ayuda").innerHTML = t("demo_ayuda");
+
+  /* Lo que se dibuja por JavaScript hay que repintarlo */
+  if (socio) {
+    pintarSaldo();
+    pintarColecciones();
+    pintarProductos();
+    if (pantalla === "carrito") pintarCarrito();
+    if (pantalla === "pedidos") cargarPedidos();
+    if (pantalla === "tokens")  cargarTokens();
+    if (modalProd && $("modal-prod").classList.contains("open")) pintarModalProd();
+  }
+}
+
+document.querySelectorAll(".idioma button").forEach(function(b){
+  b.onclick = function(){ cambiarIdioma(b.getAttribute("data-idioma")); };
+});
+
+
+/* ==========================================================================
+   LOGIN Y SESIÓN
+   ========================================================================== */
+var CLAVE_SESION = "club_socio_id";
+
+async function entrar(){
+  var u = $("in-usuario").value.trim();
+  var p = $("in-pass").value;
+  $("login-error").style.display = "none";
+
+  if (!u || !p) { errorLogin(t("err_campos")); return; }
+
+  var btn = $("btn-entrar");
+  btn.disabled = true; btn.textContent = t("entrando");
+
+  try {
+    var res = await sb("socios?usuario=eq." + encodeURIComponent(u.toLowerCase()));
+    var s = res[0];
+
+    if (!s || s.password !== p) { errorLogin(t("err_credenciales")); return; }
+    if (s.estado !== "activo")  { errorLogin(t("err_inactivo")); return; }
+
+    socio = s;
+    try { localStorage.setItem(CLAVE_SESION, String(s.id)); } catch(e){}
+    await abrirApp();
+  } catch(e){
+    errorLogin(t("err_conexion"));
+  } finally {
+    btn.disabled = false; btn.textContent = t("entrar");
+  }
+}
+
+function errorLogin(msg){
+  var el = $("login-error");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+function salir(){
+  confirmar(t("salir_titulo"), t("salir_texto"), function(){
+    try { localStorage.removeItem(CLAVE_SESION); } catch(e){}
+    socio = null; carrito = [];
+    actualizarContador();
+    $("app").style.display = "none";
+    $("login").style.display = "block";
+    $("in-pass").value = "";
+  });
+}
+
+async function abrirApp(){
+  $("login").style.display = "none";
+  $("app").style.display = "block";
+  $("h-club").textContent = CLUB_NOMBRE;
+  $("h-nombre").textContent = socio.nombre + (socio.apellido ? " " + socio.apellido : "");
+  pintarSaldo();
+  await cargarCatalogo();
+  ir("catalogo");
+}
+
+function pintarSaldo(){
+  $("h-saldo").textContent = num(socio.saldo_tokens);
+  $("t-saldo").textContent = num(socio.saldo_tokens);
+}
+
+/* Relee el saldo desde la base antes de operar con tokens, por si el admin
+   cargó o descontó algo mientras la app estaba abierta. */
+async function refrescarSocio(){
+  var res = await sb("socios?id=eq." + socio.id);
+  if (res[0]) socio = res[0];
+  pintarSaldo();
+}
+
+
+/* ==========================================================================
+   NAVEGACIÓN
+   ========================================================================== */
+function ir(destino){
+  pantalla = destino;
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
+  var el = $("s-" + destino);
+  if (el) el.classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(function(b){
+    if (b.getAttribute("data-nav") === destino) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
+
+  window.scrollTo(0, 0);
+
+  if (destino === "carrito") pintarCarrito();
+  if (destino === "pedidos") cargarPedidos();
+  if (destino === "tokens")  cargarTokens();
+}
+
+
+/* ==========================================================================
+   CATÁLOGO
+   ========================================================================== */
+async function cargarCatalogo(){
+  $("grid").innerHTML = '<div class="cargando">' + t("cargando") + '</div>';
+  try {
+    productos = await sb("productos?activo=eq.true&order=orden.asc");
+  } catch(e){
+    $("grid").innerHTML = '<div class="aviso err" style="margin:0 var(--pad)">' + t("err_catalogo") + '</div>';
+    return;
+  }
+  pintarColecciones();
+  pintarProductos();
+}
+
+function pintarColecciones(){
+  if (!productos.length) return;
+
+  var cats = [];
+  productos.forEach(function(p){ if (cats.indexOf(p.categoria) < 0) cats.push(p.categoria); });
+  if (!catActual || cats.indexOf(catActual) < 0) catActual = cats[0] || null;
+
+  $("colecciones").innerHTML = cats.map(function(c){
+    return '<button class="coleccion" data-cat="' + esc(c) + '" aria-pressed="' +
+           (c === catActual ? "true" : "false") + '">' + esc(etiquetaColeccion(c)) + '</button>';
+  }).join("");
+
+  document.querySelectorAll("#colecciones .coleccion").forEach(function(b){
+    b.onclick = function(){
+      catActual = b.getAttribute("data-cat");
+      pintarColecciones();
+      pintarProductos();
+    };
+  });
+}
+
+function pintarProductos(){
+  if (!catActual) return;
+
+  var lista = productos.filter(function(p){ return p.categoria === catActual; });
+  var cab = $("titulo-coleccion");
+  cab.querySelector("h1").textContent = etiquetaColeccion(catActual);
+  cab.querySelector("p").textContent = lista.length === 1 ? t("pieza", 1) : t("piezas", lista.length);
+
+  if (!lista.length) {
+    $("grid").innerHTML = '<div class="vacio"><p>' + t("coleccion_vacia") + '</p></div>';
+    return;
+  }
+
+  $("grid").innerHTML = lista.map(function(p){
+    var libre = p.stock - cantidadEnCarrito(p.id);
+    var estado = libre <= 0 ? t("no_disponible")
+               : (libre <= 5 ? t("quedan", libre) : t("disponible"));
+
+    var foto = p.imagen_url
+      ? '<img src="' + esc(p.imagen_url) + '" alt="' + esc(p.nombre) + '">'
+      : '<div class="sin-foto">' + t("sin_foto") + '</div>';
+
+    return '<button class="ficha' + (libre <= 0 ? ' agotado' : '') + '" data-id="' + p.id + '">' +
+             '<div class="foto">' + foto + '</div>' +
+             '<div class="datos">' +
+               '<h3>' + esc(p.nombre) + '</h3>' +
+               '<p class="sub">' + esc(p.descripcion || "") + '</p>' +
+               '<div class="meta">' + tokHTML(p.precio_tokens) +
+                 '<span class="estado">' + estado + '</span>' +
+               '</div>' +
+             '</div>' +
+           '</button>';
+  }).join("");
+
+  document.querySelectorAll(".ficha").forEach(function(b){
+    b.onclick = function(){ abrirProducto(Number(b.getAttribute("data-id"))); };
+  });
+}
+
+function abrirProducto(id){
+  var p = productos.filter(function(x){ return x.id === id; })[0];
+  if (!p) return;
+  modalProd = p;
+  modalQty = 1;
+  pintarModalProd();
+  abrirModal("modal-prod");
+}
+
+function pintarModalProd(){
+  var p = modalProd;
+  var libre = p.stock - cantidadEnCarrito(p.id);
+
+  $("mp-foto").innerHTML = p.imagen_url
+    ? '<img src="' + esc(p.imagen_url) + '" alt="' + esc(p.nombre) + '">'
+    : '<div class="sin-foto">' + t("sin_foto") + '</div>';
+
+  $("mp-nombre").textContent = p.nombre;
+  $("mp-sub").textContent = p.descripcion || "";
+  $("mp-precio").textContent = num(p.precio_tokens);
+
+  $("mp-qty").textContent = modalQty;
+  $("mp-menos").disabled = modalQty <= 1;
+  $("mp-mas").disabled   = modalQty >= libre;
+
+  $("mp-stock").textContent = libre <= 0 ? t("no_disponible")
+                            : (libre === 1 ? t("unidad_disp") : t("unidades_disp", libre));
+
+  var costo = p.precio_tokens * modalQty;
+  var aviso = "";
+  if (libre <= 0) aviso = '<div class="aviso err">' + t("agotado_texto") + '</div>';
+  else if (costo > saldoDisponible()) aviso = '<div class="aviso avi">' + t("saldo_no_alcanza", num(saldoDisponible())) + '</div>';
+  $("mp-aviso").innerHTML = aviso;
+
+  var btn = $("mp-agregar");
+  btn.disabled = libre <= 0;
+  btn.textContent = libre <= 0 ? t("no_disponible") : t("agregar", num(costo));
+}
+
+$("mp-menos").onclick = function(){ if (modalQty > 1) { modalQty--; pintarModalProd(); } };
+$("mp-mas").onclick = function(){
+  var libre = modalProd.stock - cantidadEnCarrito(modalProd.id);
+  if (modalQty < libre) { modalQty++; pintarModalProd(); }
+};
+
+$("mp-agregar").onclick = function(){
+  var p = modalProd;
+  var existente = carrito.filter(function(i){ return i.producto_id === p.id; })[0];
+
+  if (existente) existente.cantidad += modalQty;
+  else carrito.push({
+    producto_id:p.id, nombre:p.nombre,
+    precio_tokens:p.precio_tokens, cantidad:modalQty, stock:p.stock
+  });
+
+  cerrarModal("modal-prod");
+  actualizarContador();
+  pintarProductos();
+  toast(t("agregado", modalQty, p.nombre));
+};
+
+
+/* ==========================================================================
+   CARRITO
+   ========================================================================== */
+function cantidadEnCarrito(pid){
+  var i = carrito.filter(function(x){ return x.producto_id === pid; })[0];
+  return i ? i.cantidad : 0;
+}
+
+function totalCarrito(){
+  return carrito.reduce(function(a, i){ return a + i.precio_tokens * i.cantidad; }, 0);
+}
+
+/* Tokens que todavía no están comprometidos en el carrito */
+function saldoDisponible(){
+  return (socio ? socio.saldo_tokens : 0) - totalCarrito();
+}
+
+function actualizarContador(){
+  var n = carrito.reduce(function(a, i){ return a + i.cantidad; }, 0);
+  var el = $("contador");
+  el.textContent = n;
+  el.style.display = n > 0 ? "flex" : "none";
+}
+
+function pintarCarrito(){
+  var cont = $("carrito-cont");
+
+  if (!carrito.length) {
+    cont.innerHTML =
+      '<div class="vacio">' +
+        '<div class="ico"><svg width="26" height="26"><use href="#i-carrito"/></svg></div>' +
+        '<p>' + t("carrito_vacio") + '</p>' +
+        '<button class="btn btn-linea btn-sm" onclick="ir(\'catalogo\')">' + t("ver_catalogo") + '</button>' +
+      '</div>';
+    return;
+  }
+
+  var total = totalCarrito();
+  var alcanza = total <= socio.saldo_tokens;
+  var pedidosActivos = config.pedidos_activos !== "false";
+  var notaPrevia = $("in-nota") ? $("in-nota").value : "";
+
+  var html = carrito.map(function(i, idx){
+    return '<div class="renglon">' +
+             '<div class="info">' +
+               '<h4>' + esc(i.nombre) + '</h4>' +
+               '<div class="sub">' + t("cada_uno", num(i.precio_tokens)) + '</div>' +
+               tokHTML(i.precio_tokens * i.cantidad) +
+             '</div>' +
+             '<div class="cant">' +
+               '<button data-menos="' + idx + '">−</button>' +
+               '<div class="n">' + i.cantidad + '</div>' +
+               '<button data-mas="' + idx + '"' + (i.cantidad >= i.stock ? ' disabled' : '') + '>+</button>' +
+             '</div>' +
+           '</div>';
+  }).join("");
+
+  html += '<div class="cuenta">' +
+            '<div class="linea"><span class="rotulo">' + t("saldo") + '</span>' + tokHTML(socio.saldo_tokens) + '</div>' +
+            '<div class="linea total"><span class="rotulo">' + t("total") + '</span>' + tokHTML(total) + '</div>' +
+          '</div>';
+
+  if (!alcanza) html += '<div class="aviso err">' + t("faltan", num(total - socio.saldo_tokens)) + '</div>';
+  else if (!pedidosActivos) html += '<div class="aviso avi">' + t("pedidos_pausados") + '</div>';
+  else html += '<div class="aviso neu">' + t("quedaran", num(socio.saldo_tokens - total)) + '</div>';
+
+  html += '<div class="campo" style="margin-top:6px">' +
+            '<label for="in-nota">' + t("nota_label") + '</label>' +
+            '<textarea id="in-nota" rows="2" placeholder="' + esc(t("nota_ph")) + '">' + esc(notaPrevia) + '</textarea>' +
+          '</div>';
+
+  html += '<button class="btn" id="btn-confirmar"' + (!alcanza || !pedidosActivos ? ' disabled' : '') + '>' +
+            t("confirmar_pedido", num(total)) + '</button>';
+  html += '<button class="btn btn-linea" style="margin:10px 0 30px" id="btn-vaciar">' + t("vaciar") + '</button>';
+
+  cont.innerHTML = html;
+
+  cont.querySelectorAll("[data-menos]").forEach(function(b){
+    b.onclick = function(){ cambiarCantidad(Number(b.getAttribute("data-menos")), -1); };
+  });
+  cont.querySelectorAll("[data-mas]").forEach(function(b){
+    b.onclick = function(){ cambiarCantidad(Number(b.getAttribute("data-mas")), 1); };
+  });
+  var bc = $("btn-confirmar"); if (bc) bc.onclick = confirmarPedido;
+  $("btn-vaciar").onclick = function(){
+    confirmar(t("vaciar_titulo"), t("vaciar_texto"), function(){
+      carrito = []; actualizarContador(); pintarCarrito(); pintarProductos();
+    });
+  };
+}
+
+function cambiarCantidad(idx, delta){
+  var i = carrito[idx];
+  if (!i) return;
+  i.cantidad += delta;
+  if (i.cantidad < 1) carrito.splice(idx, 1);
+  else if (i.cantidad > i.stock) i.cantidad = i.stock;
+  actualizarContador();
+  pintarCarrito();
+  pintarProductos();
+}
+
+
+/* ==========================================================================
+   CONFIRMAR PEDIDO
+     1. Se releen saldo y stock reales (pudieron cambiar).
+     2. Se crea el pedido, con el precio congelado de hoy.
+     3. Se descuenta el saldo.
+     4. Se registra el movimiento y se baja el stock.
+   ========================================================================== */
+async function confirmarPedido(){
+  if (procesando || !carrito.length) return;
+  procesando = true;
+
+  var btn = $("btn-confirmar");
+  if (btn) { btn.disabled = true; btn.textContent = t("confirmando"); }
+
+  try {
+    await refrescarSocio();
+    productos = await sb("productos?activo=eq.true&order=orden.asc");
+
+    var total = totalCarrito();
+
+    if (total > socio.saldo_tokens) {
+      toast(t("err_saldo_cambio"));
+      pintarCarrito();
+      return;
+    }
+
+    var sinStock = [];
+    carrito.forEach(function(i){
+      var p = productos.filter(function(x){ return x.id === i.producto_id; })[0];
+      if (!p || p.stock < i.cantidad) sinStock.push(i.nombre);
+      else i.stock = p.stock;
+    });
+    if (sinStock.length) {
+      toast(t("err_sin_stock", sinStock.join(", ")));
+      pintarCarrito();
+      return;
+    }
+
+    var items = carrito.map(function(i){
+      return {
+        producto_id:i.producto_id, nombre:i.nombre, cantidad:i.cantidad,
+        precio_tokens:i.precio_tokens, subtotal:i.precio_tokens * i.cantidad
+      };
+    });
+
+    var notaEl = $("in-nota");
+    var nombreCompleto = socio.nombre + (socio.apellido ? " " + socio.apellido : "");
+
+    var res = await sb("pedidos", "POST", {
+      socio_id: socio.id,
+      socio_nombre: nombreCompleto,
+      items: items,
+      total_tokens: total,
+      estado: "pendiente",
+      nota: notaEl && notaEl.value.trim() ? notaEl.value.trim() : null
+    });
+    var pedido = Array.isArray(res) ? res[0] : res;
+
+    var nuevoSaldo = socio.saldo_tokens - total;
+    await sb("socios?id=eq." + socio.id, "PATCH", { saldo_tokens: nuevoSaldo });
+    socio.saldo_tokens = nuevoSaldo;
+
+    await sb("movimientos_tokens", "POST", {
+      socio_id: socio.id,
+      socio_nombre: nombreCompleto,
+      tipo: "consumo_pedido",
+      cantidad: -total,
+      saldo_resultante: nuevoSaldo,
+      referencia: null,
+      referencia_id: pedido.id
+    });
+
+    for (var k = 0; k < carrito.length; k++) {
+      var it = carrito[k];
+      var prod = productos.filter(function(x){ return x.id === it.producto_id; })[0];
+      if (prod) await sb("productos?id=eq." + it.producto_id, "PATCH", { stock: prod.stock - it.cantidad });
+    }
+
+    carrito = [];
+    actualizarContador();
+    pintarSaldo();
+    await cargarCatalogo();
+
+    $("exito-num").textContent = t("numero", nroPedido(pedido.id));
+    $("exito-total").textContent = num(total);
+    $("exito-saldo").textContent = num(nuevoSaldo);
+    ir("exito");
+
+  } catch(e){
+    toast(t("err_confirmar"));
+    pintarCarrito();
+  } finally {
+    procesando = false;
+  }
+}
+
+
+/* ==========================================================================
+   MIS PEDIDOS
+   ========================================================================== */
+async function cargarPedidos(){
+  var cont = $("pedidos-cont");
+  cont.innerHTML = '<div class="cargando">' + t("cargando") + '</div>';
+
+  var lista;
+  try {
+    lista = await sb("pedidos?socio_id=eq." + socio.id + "&order=created_at.desc");
+  } catch(e){
+    cont.innerHTML = '<div class="aviso err">' + t("err_pedidos") + '</div>';
+    return;
+  }
+
+  if (!lista.length) {
+    cont.innerHTML =
+      '<div class="vacio">' +
+        '<div class="ico"><svg width="26" height="26"><use href="#i-pedidos"/></svg></div>' +
+        '<p>' + t("sin_pedidos") + '</p>' +
+        '<button class="btn btn-linea btn-sm" onclick="ir(\'catalogo\')">' + t("ver_catalogo") + '</button>' +
+      '</div>';
+    return;
+  }
+
+  cont.innerHTML = lista.map(function(p){
+    var items = Array.isArray(p.items) ? p.items : [];
+
+    var filas = items.map(function(i){
+      return '<div><span>' + i.cantidad + ' × ' + esc(i.nombre) + '</span>' +
+             '<span class="cifra">' + num(i.subtotal) + '</span></div>';
+    }).join("");
+
+    var accion = p.estado === "pendiente"
+      ? '<button class="btn btn-peligro btn-sm" data-cancelar="' + p.id + '">' + t("cancelar_pedido") + '</button>'
+      : '';
+
+    return '<div class="pedido">' +
+             '<div class="cab">' +
+               '<div>' +
+                 '<div class="num">' + nroPedido(p.id) + '</div>' +
+                 '<div class="fecha">' + fecha(p.created_at) + '</div>' +
+               '</div>' +
+               '<span class="marca-estado ' + (ESTADO_CLASE[p.estado] || "e-neu") + '">' +
+                 etiquetaEstado(p.estado) + '</span>' +
+             '</div>' +
+             '<div class="items">' + filas + '</div>' +
+             (p.nota ? '<div class="nota">' + esc(p.nota) + '</div>' : '') +
+             '<div class="pie">' + tokHTML(p.total_tokens) + accion + '</div>' +
+           '</div>';
+  }).join("");
+
+  cont.querySelectorAll("[data-cancelar]").forEach(function(b){
+    b.onclick = function(){
+      var id = Number(b.getAttribute("data-cancelar"));
+      var p = lista.filter(function(x){ return x.id === id; })[0];
+      confirmar(
+        t("cancelar_titulo", nroPedido(id)),
+        t("cancelar_texto", num(p.total_tokens)),
+        function(){ cancelarPedido(p); }
+      );
+    };
+  });
+}
+
+async function cancelarPedido(p){
+  try {
+    await sb("pedidos?id=eq." + p.id, "PATCH", {
+      estado: "cancelado",
+      cancelado_en: new Date().toISOString()
+    });
+
+    await refrescarSocio();
+    var nuevoSaldo = socio.saldo_tokens + p.total_tokens;
+    await sb("socios?id=eq." + socio.id, "PATCH", { saldo_tokens: nuevoSaldo });
+    socio.saldo_tokens = nuevoSaldo;
+
+    await sb("movimientos_tokens", "POST", {
+      socio_id: socio.id,
+      socio_nombre: socio.nombre + (socio.apellido ? " " + socio.apellido : ""),
+      tipo: "devolucion_pedido",
+      cantidad: p.total_tokens,
+      saldo_resultante: nuevoSaldo,
+      referencia: null,
+      referencia_id: p.id
+    });
+
+    var items = Array.isArray(p.items) ? p.items : [];
+    for (var k = 0; k < items.length; k++) {
+      var it = items[k];
+      var actual = await sb("productos?id=eq." + it.producto_id);
+      if (actual[0]) await sb("productos?id=eq." + it.producto_id, "PATCH", { stock: actual[0].stock + it.cantidad });
+    }
+
+    pintarSaldo();
+    await cargarPedidos();
+    await cargarCatalogo();
+    toast(t("cancelado_ok", num(p.total_tokens)));
+  } catch(e){
+    toast(t("err_cancelar"));
+  }
+}
+
+
+/* ==========================================================================
+   MIS TOKENS
+   ========================================================================== */
+async function cargarTokens(){
+  await refrescarSocio();
+
+  var cont = $("movs-cont");
+  cont.innerHTML = '<div class="cargando" style="padding:24px 0">' + t("cargando") + '</div>';
+
+  var movs;
+  try {
+    movs = await sb("movimientos_tokens?socio_id=eq." + socio.id + "&order=created_at.desc");
+  } catch(e){
+    cont.innerHTML = '<div class="aviso err">' + t("err_movimientos") + '</div>';
+    return;
+  }
+
+  if (!movs.length) {
+    cont.innerHTML = '<div class="cargando" style="padding:24px 0">' + t("sin_movimientos") + '</div>';
+    return;
+  }
+
+  cont.innerHTML = movs.map(function(m){
+    var entra = m.cantidad >= 0;
+    var clase = entra ? "mas" : "menos";
+
+    /* La referencia se arma acá, en el idioma activo. En la base se guarda
+       solo el id del pedido, no una frase: si se guardara el texto, quedaría
+       congelado en el idioma en que se creó. */
+    var ref = "";
+    if (m.tipo === "consumo_pedido" || m.tipo === "devolucion_pedido") {
+      if (m.referencia_id) ref = t("pedido_ref", nroPedido(m.referencia_id));
+    } else if (m.referencia) {
+      ref = m.referencia;
+    }
+
+    return '<div class="mov">' +
+             '<div class="signo ' + clase + '">' + (entra ? "+" : "−") + '</div>' +
+             '<div class="info">' +
+               '<div class="q">' + t("m_" + m.tipo) + '</div>' +
+               '<div class="f">' + fecha(m.created_at) + (ref ? " · " + esc(ref) : "") + '</div>' +
+             '</div>' +
+             '<div class="n ' + clase + '">' + (entra ? "+" : "−") + num(Math.abs(m.cantidad)) + '</div>' +
+           '</div>';
+  }).join("");
+}
+
+async function canjearCodigo(){
+  var input = $("in-codigo");
+  var msg = $("canje-msg");
+  var codigo = input.value.trim().toUpperCase();
+  msg.innerHTML = "";
+
+  if (!codigo) { msg.innerHTML = '<div class="aviso avi">' + t("err_codigo_vacio") + '</div>'; return; }
+
+  var btn = $("btn-canjear");
+  btn.disabled = true;
+
+  try {
+    var res = await sb("codigos_canje?codigo=eq." + encodeURIComponent(codigo));
+    var c = res[0];
+
+    if (!c)      { msg.innerHTML = '<div class="aviso err">' + t("err_codigo_no_existe") + '</div>'; return; }
+    if (c.usado) { msg.innerHTML = '<div class="aviso err">' + t("err_codigo_usado") + '</div>'; return; }
+    if (c.vence_en && new Date(c.vence_en) < new Date()) {
+      msg.innerHTML = '<div class="aviso err">' + t("err_codigo_vencido") + '</div>'; return;
+    }
+
+    /* Se quema el código ANTES de acreditar. Si algo falla después, el peor
+       caso es un código perdido, no tokens acreditados dos veces. */
+    await sb("codigos_canje?id=eq." + c.id, "PATCH", {
+      usado: true, usado_por: socio.id, usado_en: new Date().toISOString()
+    });
+
+    await refrescarSocio();
+    var nuevoSaldo = socio.saldo_tokens + c.tokens;
+    await sb("socios?id=eq." + socio.id, "PATCH", { saldo_tokens: nuevoSaldo });
+    socio.saldo_tokens = nuevoSaldo;
+
+    await sb("movimientos_tokens", "POST", {
+      socio_id: socio.id,
+      socio_nombre: socio.nombre + (socio.apellido ? " " + socio.apellido : ""),
+      tipo: "canje_codigo",
+      cantidad: c.tokens,
+      saldo_resultante: nuevoSaldo,
+      referencia: c.codigo,
+      referencia_id: c.id
+    });
+
+    input.value = "";
+    msg.innerHTML = '<div class="aviso ok">' + t("canje_ok", num(c.tokens)) + '</div>';
+    pintarSaldo();
+    await cargarTokens();
+    toast(t("canje_toast", num(c.tokens)));
+
+  } catch(e){
+    msg.innerHTML = '<div class="aviso err">' + t("err_canje") + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t("canjear");
+  }
+}
+
+
+/* ==========================================================================
+   ARRANQUE
+   ========================================================================== */
+$("btn-entrar").onclick = entrar;
+$("btn-salir").onclick = salir;
+$("btn-canjear").onclick = canjearCodigo;
+
+$("in-pass").addEventListener("keydown", function(e){ if (e.key === "Enter") entrar(); });
+$("in-usuario").addEventListener("keydown", function(e){ if (e.key === "Enter") $("in-pass").focus(); });
+$("in-codigo").addEventListener("keydown", function(e){ if (e.key === "Enter") canjearCodigo(); });
+
+window.addEventListener("load", async function(){
+
+  if (!MODO_DEMO) $("cinta-demo").style.display = "none";
+
+  /* Idioma guardado en este celular. Si no hay nada, arranca en español. */
+  var guardadoIdioma = null;
+  try { guardadoIdioma = localStorage.getItem(CLAVE_IDIOMA); } catch(e){}
+  if (guardadoIdioma === "es" || guardadoIdioma === "en") IDIOMA = guardadoIdioma;
+
+  /* Configuración del club */
+  try {
+    var cfg = await sb("configuracion");
+    cfg.forEach(function(c){ config[c.clave] = c.valor; });
+    if (config.club_nombre) CLUB_NOMBRE = config.club_nombre;
+  } catch(e){ /* si falla, seguimos con los valores por defecto */ }
+
+  $("marca-nombre").textContent = CLUB_NOMBRE;
+  $("h-club").textContent = CLUB_NOMBRE;
+
+  aplicarIdioma();
+
+  /* Sesión guardada */
+  var guardado = null;
+  try { guardado = localStorage.getItem(CLAVE_SESION); } catch(e){}
+
+  if (guardado) {
+    try {
+      var res = await sb("socios?id=eq." + guardado);
+      if (res[0] && res[0].estado === "activo") {
+        socio = res[0];
+        await abrirApp();
+        return;
+      }
+      localStorage.removeItem(CLAVE_SESION);
+    } catch(e){}
+  }
+
+  $("in-usuario").focus();
+});
+</script>
+</body>
+</html>
