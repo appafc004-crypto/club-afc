@@ -423,6 +423,51 @@ nav .contador{
 #cinta-demo{background:var(--avi-bg);color:var(--avi);text-align:center;
   font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:6px}
 
+/* ==========================================================================
+   FORMA DE PAGO, MATRÍCULA Y MEMBRESÍAS
+   Cuadrado y no círculo en el selector: la identidad no tiene esquinas
+   redondeadas, tampoco acá.
+   ========================================================================== */
+.sec-pago{font-family:var(--serif);font-weight:700;font-size:16px;margin:26px 0 4px}
+.metodos{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px}
+.metodo{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--linea);
+  padding:13px 14px;text-align:left;width:100%;background:var(--blanco)}
+.metodo[aria-pressed="true"]{border-color:var(--negro);box-shadow:inset 0 0 0 1px var(--negro)}
+.metodo .punto{width:13px;height:13px;border:1px solid var(--texto-3);flex:0 0 auto;margin-top:3px}
+.metodo[aria-pressed="true"] .punto{border-color:var(--negro);background:var(--negro);
+  box-shadow:inset 0 0 0 2px var(--blanco)}
+.metodo .txt b{display:block;font-size:13px;font-weight:600}
+.metodo .txt span{display:block;font-size:11.5px;color:var(--texto-3);margin-top:3px;line-height:1.5}
+.metodo:disabled{opacity:.4;cursor:not-allowed}
+.datos-pago{background:var(--campo-bg);border:1px solid var(--campo-borde);padding:14px;
+  font-size:12.5px;line-height:1.7;white-space:pre-line;margin:12px 0 14px;user-select:all}
+.datos-pago .rot{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--texto-3);font-weight:600;margin-bottom:4px;user-select:none}
+.adjunto{display:flex;align-items:center;gap:10px;border:1px dashed var(--campo-borde);
+  padding:15px 14px;font-size:12px;color:var(--texto-2);width:100%;text-align:left;background:var(--blanco)}
+.adjunto.ok{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.adjunto .ico{width:18px;height:18px;flex:0 0 auto}
+.gramos-linea{font-size:12.5px}
+.pago{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+  padding:13px 0;border-bottom:1px solid var(--linea-suave)}
+.pago:last-child{border-bottom:none}
+.pago .q{font-size:12.5px;font-weight:500}
+.pago .f{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-3);
+  margin-top:3px;line-height:1.5}
+.pago .motivo{font-size:11.5px;color:var(--err);margin-top:5px;text-transform:none;letter-spacing:0}
+.plan{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--linea-suave)}
+.plan:last-child{border-bottom:none}
+.plan .n{font-family:var(--serif);font-weight:700;font-size:16px}
+.plan .d{font-size:11px;color:var(--texto-3);margin-top:3px}
+.plan .btn-sm{flex:0 0 auto}
+.pedido .motivo{border-top:1px solid var(--linea-suave);padding:12px 18px;font-size:12px;
+  color:var(--err);line-height:1.55}
+.pedido .info-pago{border-top:1px solid var(--linea-suave);padding:12px 18px;font-size:11.5px;
+  color:var(--avi);line-height:1.55}
+#aviso-matricula .aviso{margin:16px var(--pad) 0}
+#aviso-matricula .btn-sm{margin-top:10px}
+
 @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
@@ -447,6 +492,9 @@ nav .contador{
   </symbol>
   <symbol id="i-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
     <path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>
+  </symbol>
+  <symbol id="i-adjunto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M14.5 3H6v18h12V6.5L14.5 3Z"/><path d="M14.5 3v3.5H18"/><path d="M9 13h6M9 16.5h4"/>
   </symbol>
   <symbol id="i-vacio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
     <rect x="3.5" y="3.5" width="17" height="17"/><path d="M3.5 3.5 20.5 20.5"/>
@@ -512,6 +560,7 @@ nav .contador{
 
   <!-- ---------- CATÁLOGO ---------- -->
   <div class="screen active" id="s-catalogo">
+    <div id="aviso-matricula"></div>
     <div class="colecciones" id="colecciones"></div>
     <div class="titulo-sec" id="titulo-coleccion"><h1></h1><p></p></div>
     <div class="grid" id="grid"></div>
@@ -540,6 +589,9 @@ nav .contador{
         <div class="unidad" data-t="tokens_unidad">Tokens</div>
       </div>
 
+      <div id="bloque-matricula"></div>
+      <div id="bloque-membresias"></div>
+
       <div class="bloque">
         <h3 data-t="canjear_codigo">Canjear un código</h3>
         <p class="bajada" data-t="canjear_bajada"></p>
@@ -548,6 +600,12 @@ nav .contador{
           <button class="btn" id="btn-canjear" data-t="canjear">Canjear</button>
         </div>
         <div id="canje-msg"></div>
+      </div>
+
+      <div class="bloque">
+        <h3 data-t="mis_pagos">Mis pagos</h3>
+        <p class="bajada" data-t="mis_pagos_bajada"></p>
+        <div id="pagos-cont"></div>
       </div>
 
       <div class="bloque">
@@ -562,12 +620,13 @@ nav .contador{
   <div class="screen" id="s-exito">
     <div class="sello"><svg class="ico"><use href="#i-cruz"/></svg></div>
     <div class="centro">
-      <h2 data-t="pedido_confirmado">Pedido confirmado</h2>
+      <h2 id="exito-titulo">Pedido confirmado</h2>
       <div class="num" id="exito-num"></div>
+      <div id="exito-aviso" style="text-align:left"></div>
       <div class="detalle">
         <div class="linea"><span class="rotulo" data-t="total_pedido">Total del pedido</span>
           <span class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="exito-total"></span></span></div>
-        <div class="linea"><span class="rotulo" data-t="saldo_restante">Saldo restante</span>
+        <div class="linea" id="exito-linea-saldo"><span class="rotulo" data-t="saldo_restante">Saldo restante</span>
           <span class="tok"><svg class="ico"><use href="#i-token"/></svg><span id="exito-saldo"></span></span></div>
       </div>
       <button class="btn" onclick="ir('pedidos')" data-t="ver_pedidos">Ver mis pedidos</button>
@@ -609,6 +668,23 @@ nav .contador{
       <div id="mp-aviso"></div>
       <button class="btn" id="mp-agregar"></button>
       <button class="btn btn-linea" style="margin-top:10px" onclick="cerrarModal('modal-prod')" data-t="cancelar">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE PAGO (matrícula y membresías) ===== -->
+<div class="overlay" id="modal-pago">
+  <div class="hoja">
+    <div class="cuerpo">
+      <h2 id="mpg-titulo"></h2>
+      <p class="desc" id="mpg-texto"></p>
+      <div class="cuenta" style="margin-top:16px">
+        <div class="linea total"><span class="rotulo" data-t="total">Total</span><span id="mpg-total"></span></div>
+      </div>
+      <div id="mpg-form"></div>
+      <div id="mpg-error"></div>
+      <button class="btn" id="mpg-enviar" style="margin-top:14px"></button>
+      <button class="btn btn-linea" style="margin-top:10px" onclick="cerrarModal('modal-pago')" data-t="cancelar">Cancelar</button>
     </div>
   </div>
 </div>
@@ -795,7 +871,83 @@ var TEXTOS = {
     err_codigo_vencido:"Ese código está vencido.",
     err_pass_corta:"La contraseña tiene que tener al menos 8 caracteres.",
     canjeando:"Canjeando…",
-    demo_ayuda:"Modo demo: los datos son de prueba.<br>Probá con <b>martin / demo1234</b> y el código <b>PRUEBA100</b>."
+    demo_ayuda:"Modo demo: los datos son de prueba.<br>Probá con <b>martin / demo1234</b> y el código <b>PRUEBA100</b>.",
+
+    /* --- Compras con comprobante, matrícula y membresías --- */
+    e_esperando_pago:"Esperando pago",
+    gramos_u:"{0} g",
+    gramos_por_unidad:"{0} g por unidad",
+    gramos_total:"Gramos del pedido",
+    min_gramos:"La compra mínima es de <b>{0} g</b>. Te faltan {1} g.",
+    max_gramos:"La compra máxima es de <b>{0} g</b>. Sacá {1} g del pedido.",
+    forma_pago:"Forma de pago",
+    m_saldo:"Con mi saldo",
+    m_saldo_sub:"Se descuenta de tus {0} tokens al confirmar.",
+    m_transf:"Transferencia",
+    m_transf_sub:"Transferís y adjuntás el comprobante. El club lo revisa y aprueba el pedido.",
+    m_efectivo:"Efectivo en el local",
+    m_efectivo_sub:"Lo pagás cuando vas al club. El pedido queda reservado hasta entonces.",
+    datos_transf:"Datos para transferir",
+    sin_datos_transf:"Pedile al club los datos para transferir.",
+    nro_operacion:"Número de operación",
+    nro_operacion_ph:"Figura en el comprobante",
+    nro_operacion_ayuda:"Cada comprobante se puede usar una sola vez.",
+    adjuntar:"Adjuntar comprobante (foto o PDF)",
+    adjunto_listo:"Comprobante listo: {0}",
+    procesando_archivo:"Preparando el archivo…",
+    efectivo_nota:"Acercate al club a pagar. Cuando el club confirme el pago, tu pedido pasa a preparación.",
+    enviar_pedido_transf:"Enviar pedido y comprobante",
+    enviar_pedido_efectivo:"Confirmar — pago en el local",
+    err_falta_archivo:"Adjuntá el comprobante de la transferencia.",
+    err_falta_operacion:"Escribí el número de operación del comprobante.",
+    err_archivo_tipo:"El comprobante tiene que ser una foto o un PDF.",
+    err_archivo_grande:"El archivo es muy pesado. Mandá una captura de pantalla en vez del PDF.",
+    err_operacion_repetida:"Ese número de operación ya se usó en otro pago.",
+    err_minimo_gramos:"La compra mínima es de {0} g.",
+    err_maximo_gramos:"La compra máxima es de {0} g.",
+    err_matricula:"Primero tenés que pagar la matrícula del club.",
+    err_pagos_pendientes:"Tenés demasiados pagos en revisión. Esperá a que el club los apruebe.",
+    err_pedido_pagado:"Ese pedido ya está pagado. Escribile al club para cancelarlo.",
+    err_metodo:"Elegí una forma de pago.",
+    err_membresia:"Esa membresía ya no está disponible.",
+    err_matricula_paga:"Tu matrícula ya está paga.",
+    pedido_recibido:"Pedido recibido",
+    exito_transf:"El club va a revisar tu comprobante. Cuando lo apruebe, el pedido pasa a preparación. Lo seguís desde Mis pedidos.",
+    exito_efectivo:"Tu pedido queda reservado. Pagalo en el local y, cuando el club lo confirme, pasa a preparación.",
+    info_efectivo:"Pago en efectivo en el local, pendiente.",
+    info_transf:"Comprobante en revisión por el club.",
+    pago_rechazado:"Pago rechazado: {0}",
+    pago_rechazado_sin:"El club rechazó el pago.",
+    cancelar_texto_reserva:"El pedido se cancela y los productos vuelven al catálogo. Si ya transferiste, avisale al club.",
+    cancelado_reserva_ok:"Pedido cancelado",
+
+    matricula:"Matrícula de ingreso",
+    matricula_bajada:"Es un pago único para asociarte al club. Hasta que el club la apruebe, no podés hacer pedidos.",
+    matricula_pagar:"Pagar matrícula",
+    matricula_revision:"Tu matrícula está en revisión. Cuando el club la apruebe vas a poder hacer pedidos.",
+    matricula_falta:"Para hacer pedidos primero tenés que pagar la matrícula del club.",
+    matricula_titulo:"Pagar la matrícula",
+    matricula_texto:"Pago único al asociarte. Se registra en tokens y, cuando el club lo aprueba, ya podés pedir.",
+
+    membresias:"Membresías",
+    membresias_bajada:"Elegí un plan. Cuando el club aprueba el pago, se te acreditan los tokens.",
+    membresia_contratar:"Contratar",
+    membresia_revision:"En revisión",
+    membresia_titulo:"Contratar {0}",
+    membresia_texto:"Equivale a {0} g. Cuando el club aprueba el pago, se te acreditan {1} tokens.",
+    membresia_d:"{0} g · {1} tokens",
+
+    enviar_pago:"Enviar pago",
+    pago_enviado:"Pago enviado. El club lo va a revisar.",
+    mis_pagos:"Mis pagos",
+    mis_pagos_bajada:"Los pagos que mandaste y en qué quedaron.",
+    sin_pagos:"Todavía no mandaste ningún pago.",
+    p_pedido:"Pedido {0}",
+    p_matricula:"Matrícula",
+    p_membresia:"Membresía {0}",
+    pe_pendiente:"En revisión", pe_aprobado:"Aprobado", pe_rechazado:"Rechazado", pe_cancelado:"Cancelado",
+    pm_transferencia:"Transferencia", pm_efectivo:"Efectivo",
+    m_pago_membresia:"Membresía acreditada"
   },
 
   en: {
@@ -917,7 +1069,82 @@ var TEXTOS = {
     err_codigo_vencido:"That code has expired.",
     err_pass_corta:"The password must be at least 8 characters long.",
     canjeando:"Redeeming…",
-    demo_ayuda:"Demo mode: sample data only.<br>Try <b>martin / demo1234</b> and code <b>PRUEBA100</b>."
+    demo_ayuda:"Demo mode: sample data only.<br>Try <b>martin / demo1234</b> and code <b>PRUEBA100</b>.",
+
+    e_esperando_pago:"Awaiting payment",
+    gramos_u:"{0} g",
+    gramos_por_unidad:"{0} g per unit",
+    gramos_total:"Order weight",
+    min_gramos:"The minimum purchase is <b>{0} g</b>. You need {1} g more.",
+    max_gramos:"The maximum purchase is <b>{0} g</b>. Remove {1} g from the order.",
+    forma_pago:"Payment method",
+    m_saldo:"With my balance",
+    m_saldo_sub:"Deducted from your {0} tokens when you confirm.",
+    m_transf:"Bank transfer",
+    m_transf_sub:"Transfer and attach the receipt. The club reviews it and approves the order.",
+    m_efectivo:"Cash at the club",
+    m_efectivo_sub:"Pay when you visit the club. The order stays reserved until then.",
+    datos_transf:"Transfer details",
+    sin_datos_transf:"Ask the club for the transfer details.",
+    nro_operacion:"Transaction number",
+    nro_operacion_ph:"Shown on the receipt",
+    nro_operacion_ayuda:"Each receipt can only be used once.",
+    adjuntar:"Attach receipt (photo or PDF)",
+    adjunto_listo:"Receipt ready: {0}",
+    procesando_archivo:"Preparing the file…",
+    efectivo_nota:"Visit the club to pay. Once the club confirms the payment, your order moves to preparation.",
+    enviar_pedido_transf:"Send order and receipt",
+    enviar_pedido_efectivo:"Confirm — pay at the club",
+    err_falta_archivo:"Attach the transfer receipt.",
+    err_falta_operacion:"Enter the transaction number from the receipt.",
+    err_archivo_tipo:"The receipt must be a photo or a PDF.",
+    err_archivo_grande:"The file is too large. Send a screenshot instead of the PDF.",
+    err_operacion_repetida:"That transaction number was already used for another payment.",
+    err_minimo_gramos:"The minimum purchase is {0} g.",
+    err_maximo_gramos:"The maximum purchase is {0} g.",
+    err_matricula:"You need to pay the club membership fee first.",
+    err_pagos_pendientes:"You have too many payments under review. Wait for the club to approve them.",
+    err_pedido_pagado:"That order is already paid. Contact the club to cancel it.",
+    err_metodo:"Choose a payment method.",
+    err_membresia:"That membership is no longer available.",
+    err_matricula_paga:"Your membership fee is already paid.",
+    pedido_recibido:"Order received",
+    exito_transf:"The club will review your receipt. Once approved, the order moves to preparation. Follow it from My orders.",
+    exito_efectivo:"Your order is reserved. Pay at the club and, once the club confirms it, it moves to preparation.",
+    info_efectivo:"Cash payment at the club, pending.",
+    info_transf:"Receipt under review by the club.",
+    pago_rechazado:"Payment rejected: {0}",
+    pago_rechazado_sin:"The club rejected the payment.",
+    cancelar_texto_reserva:"The order is cancelled and the products go back to the catalog. If you already transferred, let the club know.",
+    cancelado_reserva_ok:"Order cancelled",
+
+    matricula:"Joining fee",
+    matricula_bajada:"A one-time payment to join the club. You cannot place orders until the club approves it.",
+    matricula_pagar:"Pay joining fee",
+    matricula_revision:"Your joining fee is under review. Once the club approves it you can place orders.",
+    matricula_falta:"To place orders you first need to pay the club joining fee.",
+    matricula_titulo:"Pay the joining fee",
+    matricula_texto:"One-time payment when you join. It is recorded in tokens and, once the club approves it, you can order.",
+
+    membresias:"Memberships",
+    membresias_bajada:"Pick a plan. Once the club approves the payment, the tokens are added to your account.",
+    membresia_contratar:"Get it",
+    membresia_revision:"Under review",
+    membresia_titulo:"Get {0}",
+    membresia_texto:"Equivalent to {0} g. Once the club approves the payment, {1} tokens are added to your account.",
+    membresia_d:"{0} g · {1} tokens",
+
+    enviar_pago:"Send payment",
+    pago_enviado:"Payment sent. The club will review it.",
+    mis_pagos:"My payments",
+    mis_pagos_bajada:"The payments you sent and their status.",
+    sin_pagos:"You have not sent any payments yet.",
+    p_pedido:"Order {0}",
+    p_matricula:"Joining fee",
+    p_membresia:"Membership {0}",
+    pe_pendiente:"Under review", pe_aprobado:"Approved", pe_rechazado:"Rejected", pe_cancelado:"Cancelled",
+    pm_transferencia:"Transfer", pm_efectivo:"Cash",
+    m_pago_membresia:"Membership credited"
   }
 };
 
@@ -968,7 +1195,14 @@ function traducirError(codigo){
     PEDIDO_INEXISTENTE:"err_cancelar", PEDIDO_EN_CURSO:"err_pedido_en_curso",
     CODIGO_INEXISTENTE:"err_codigo_no_existe", CODIGO_USADO:"err_codigo_usado",
     CODIGO_VENCIDO:"err_codigo_vencido",
-    CANTIDAD_INVALIDA:"err_confirmar", PASSWORD_CORTA:"err_pass_corta"
+    CANTIDAD_INVALIDA:"err_confirmar", PASSWORD_CORTA:"err_pass_corta",
+    MATRICULA_PENDIENTE:"err_matricula", MINIMO_GRAMOS:"err_minimo_gramos",
+    MAXIMO_GRAMOS:"err_maximo_gramos", FALTA_COMPROBANTE:"err_falta_archivo",
+    FALTA_OPERACION:"err_falta_operacion", OPERACION_REPETIDA:"err_operacion_repetida",
+    ARCHIVO_INVALIDO:"err_archivo_tipo", ARCHIVO_GRANDE:"err_archivo_grande",
+    METODO_INVALIDO:"err_metodo", PAGOS_PENDIENTES:"err_pagos_pendientes",
+    PEDIDO_PAGADO:"err_pedido_pagado", MEMBRESIA_INEXISTENTE:"err_membresia",
+    MATRICULA_YA_PAGA:"err_matricula_paga"
   };
 
   if (mapa[clave]) return dato ? t(mapa[clave], dato) : t(mapa[clave]);
@@ -1072,7 +1306,18 @@ var DEMO = {
   ],
   codigos: [
     { id:1, codigo:"PRUEBA100", tokens:100, usado:false, vence_en:null }
-  ]
+  ],
+  extra: {
+    matricula: { paga:true, tokens:300, pendiente:false },
+    compra: { min_g:10, max_g:100 },
+    transferencia: "Alias: HOUSE.AFICIONADO\nCBU: 0000003100000000000000\nTitular: Asociación Civil House of Aficionado",
+    membresias: [
+      { id:1, nombre:"Membresía 25 g", gramos:25, tokens:2500 },
+      { id:2, nombre:"Membresía 40 g", gramos:40, tokens:3800 }
+    ],
+    pagos: [],
+    gramos: { "1":5, "2":5, "3":5, "4":2, "5":2 }
+  }
 };
 
 var _demoDentro = false;
@@ -1174,6 +1419,83 @@ async function demoRPC(fn, p){
     return null;
   }
 
+  if (fn === "fn_socio_extra") return JSON.parse(JSON.stringify(DEMO.extra));
+
+  if (fn === "fn_socio_compra") {
+    var ex = DEMO.extra;
+    if (!ex.matricula.paga) demoError("MATRICULA_PENDIENTE");
+    var its = p.p_items || [];
+    if (!its.length) demoError("CARRITO_VACIO");
+    if (["saldo","transferencia","efectivo"].indexOf(p.p_metodo) < 0) demoError("METODO_INVALIDO");
+    if (p.p_metodo === "transferencia") {
+      if (!p.p_archivo) demoError("FALTA_COMPROBANTE");
+      if (!p.p_operacion) demoError("FALTA_OPERACION");
+      if (ex.pagos.some(function(x){ return x.operacion === p.p_operacion && x.estado !== "rechazado"; })) demoError("OPERACION_REPETIDA");
+    }
+    var tot = 0, gr = 0, det = [];
+    its.forEach(function(i){
+      var pr = DEMO.productos.filter(function(x){ return x.id === Number(i.producto_id); })[0];
+      if (!pr) demoError("PRODUCTO_INEXISTENTE");
+      if (pr.stock < i.cantidad) demoError("SIN_STOCK:" + pr.nombre);
+      var g = Number(ex.gramos[pr.id] || 0);
+      tot += pr.precio_tokens * i.cantidad; gr += g * i.cantidad;
+      det.push({ producto_id:pr.id, nombre:pr.nombre, cantidad:i.cantidad, precio_tokens:pr.precio_tokens,
+                 subtotal:pr.precio_tokens * i.cantidad, gramos:g });
+    });
+    if (gr > 0 && gr < ex.compra.min_g) demoError("MINIMO_GRAMOS:" + ex.compra.min_g);
+    if (gr > ex.compra.max_g) demoError("MAXIMO_GRAMOS:" + ex.compra.max_g);
+    if (p.p_metodo === "saldo" && tot > DEMO.socio.saldo_tokens) demoError("SALDO_INSUFICIENTE");
+    det.forEach(function(i){ DEMO.productos.filter(function(x){ return x.id === i.producto_id; })[0].stock -= i.cantidad; });
+    var est = p.p_metodo === "saldo" ? "pendiente" : "esperando_pago";
+    var pd = { id:_demoProxId(DEMO.pedidos), socio_id:DEMO.socio.id,
+               socio_nombre:DEMO.socio.nombre + " " + DEMO.socio.apellido,
+               items:det, total_tokens:tot, estado:est, nota:p.p_nota || null,
+               created_at:new Date().toISOString(), entregado_en:null, cancelado_en:null };
+    DEMO.pedidos.unshift(pd);
+    if (p.p_metodo === "saldo") _demoMover("consumo_pedido", -tot, null, pd.id, null);
+    else ex.pagos.unshift({ id:_demoProxId(ex.pagos), concepto:"pedido", pedido_id:pd.id, tokens:tot,
+                            metodo:p.p_metodo, operacion:p.p_operacion || null, estado:"pendiente",
+                            motivo:null, created_at:new Date().toISOString() });
+    return { id:pd.id, total:tot, gramos:gr, estado:est };
+  }
+
+  if (fn === "fn_socio_pago") {
+    var ex2 = DEMO.extra, tk = 0, mid = null, mnom = null;
+    if (p.p_concepto === "matricula") {
+      if (ex2.matricula.paga) demoError("MATRICULA_YA_PAGA");
+      tk = ex2.matricula.tokens; ex2.matricula.pendiente = true;
+    } else {
+      var mb = ex2.membresias.filter(function(x){ return x.id === Number(p.p_membresia_id); })[0];
+      if (!mb) demoError("MEMBRESIA_INEXISTENTE");
+      tk = mb.tokens; mid = mb.id; mnom = mb.nombre;
+    }
+    if (p.p_metodo === "transferencia" && !p.p_archivo) demoError("FALTA_COMPROBANTE");
+    if (p.p_metodo === "transferencia" && !p.p_operacion) demoError("FALTA_OPERACION");
+    var pg = { id:_demoProxId(ex2.pagos), concepto:p.p_concepto, pedido_id:null, membresia_id:mid,
+               membresia_nombre:mnom, tokens:tk, metodo:p.p_metodo, operacion:p.p_operacion || null,
+               estado:"pendiente", motivo:null, created_at:new Date().toISOString() };
+    ex2.pagos.unshift(pg);
+    return { id:pg.id };
+  }
+
+  if (fn === "fn_socio_cancelar") {
+    var pk = DEMO.pedidos.filter(function(x){ return String(x.id) === String(p.p_pedido_id); })[0];
+    if (!pk) demoError("PEDIDO_INEXISTENTE");
+    var pagoK = DEMO.extra.pagos.filter(function(x){ return x.pedido_id === pk.id; })[0];
+    if (pk.estado === "esperando_pago") {
+      pk.estado = "cancelado"; pk.cancelado_en = new Date().toISOString();
+      if (pagoK) pagoK.estado = "cancelado";
+      (pk.items || []).forEach(function(i){
+        var pr = DEMO.productos.filter(function(x){ return x.id === i.producto_id; })[0];
+        if (pr) pr.stock += i.cantidad;
+      });
+      return { devuelto:0 };
+    }
+    if (pk.estado !== "pendiente") demoError("PEDIDO_EN_CURSO");
+    if (pagoK) demoError("PEDIDO_PAGADO");
+    return demoRPC("fn_socio_pedido_cancelar", p).then(function(){ return { devuelto:pk.total_tokens }; });
+  }
+
   if (fn === "fn_socio_canjear") {
     var cod = String(p.p_codigo || "").trim().toUpperCase();
     var c = DEMO.codigos.filter(function(x){ return x.codigo === cod; })[0];
@@ -1202,9 +1524,18 @@ var modalQty   = 1;
 var procesando = false;
 
 var ESTADO_CLASE = {
+  esperando_pago:"e-avi",
   pendiente:"e-neu", preparando:"e-avi", listo:"e-ok",
   entregado:"e-ok",  cancelado:"e-err"
 };
+
+/* Lo nuevo de compras: matrícula, mínimo y máximo, membresías, pagos y
+   gramos por producto. Llega en una llamada aparte (fn_socio_extra) para no
+   tocar la función de datos que ya andaba. */
+var EXTRA = { matricula:{ paga:true, tokens:0, pendiente:false }, compra:{ min_g:0, max_g:0 },
+              transferencia:"", membresias:[], pagos:[], gramos:{} };
+var pagoCarrito = { metodo:"transferencia", operacion:"", archivo:null, leyendo:false };
+var pagoModal   = { metodo:"transferencia", operacion:"", archivo:null, leyendo:false, concepto:null, membresia:null };
 
 
 /* ==========================================================================
@@ -1286,7 +1617,7 @@ $("mc-si").onclick = function(){
   confirmCB = null;
 };
 
-["modal-prod","modal-confirm"].forEach(function(id){
+["modal-prod","modal-confirm","modal-pago"].forEach(function(id){
   $(id).addEventListener("click", function(e){ if (e.target === this) cerrarModal(id); });
 });
 
@@ -1331,6 +1662,8 @@ function aplicarIdioma(){
     if (pantalla === "pedidos") cargarPedidos();
     if (pantalla === "tokens")  cargarTokens();
     if (modalProd && $("modal-prod").classList.contains("open")) pintarModalProd();
+    if ($("modal-pago").classList.contains("open")) pintarModalPago();
+    pintarAvisoMatricula();
   }
 }
 
@@ -1352,13 +1685,28 @@ var pedidosCache = [];
 var movsCache    = [];
 
 async function sincronizar(){
-  var d = await rpc("fn_socio_datos", { p_token:TOKEN });
+  var r = await Promise.all([
+    rpc("fn_socio_datos", { p_token:TOKEN }),
+    rpc("fn_socio_extra", { p_token:TOKEN })
+  ]);
+  var d = r[0];
 
   socio        = d.socio;
   productos    = d.productos || [];
   pedidosCache = d.pedidos || [];
   movsCache    = d.movimientos || [];
   config       = d.configuracion || {};
+
+  var x = r[1] || {};
+  EXTRA = {
+    matricula: x.matricula || { paga:true, tokens:0, pendiente:false },
+    compra: x.compra || { min_g:0, max_g:0 },
+    transferencia: x.transferencia || "",
+    membresias: x.membresias || [],
+    pagos: x.pagos || [],
+    gramos: x.gramos || {}
+  };
+  pintarAvisoMatricula();
 
   pintarSaldo();
   await traerFotos();
@@ -1528,6 +1876,7 @@ function pintarProductos(){
     var libre = p.stock - cantidadEnCarrito(p.id);
     var estado = libre <= 0 ? t("no_disponible")
                : (libre <= 5 ? t("quedan", libre) : t("disponible"));
+    if (gramosDe(p.id) > 0) estado = t("gramos_u", numG(gramosDe(p.id))) + " · " + estado;
 
     var foto = p.imagen_url
       ? '<img src="' + esc(p.imagen_url) + '" alt="' + esc(p.nombre) + '">'
@@ -1575,13 +1924,13 @@ function pintarModalProd(){
   $("mp-menos").disabled = modalQty <= 1;
   $("mp-mas").disabled   = modalQty >= libre;
 
-  $("mp-stock").textContent = libre <= 0 ? t("no_disponible")
-                            : (libre === 1 ? t("unidad_disp") : t("unidades_disp", libre));
+  $("mp-stock").textContent = (libre <= 0 ? t("no_disponible")
+                            : (libre === 1 ? t("unidad_disp") : t("unidades_disp", libre))) +
+                            (gramosDe(p.id) > 0 ? " · " + t("gramos_por_unidad", numG(gramosDe(p.id))) : "");
 
   var costo = p.precio_tokens * modalQty;
   var aviso = "";
   if (libre <= 0) aviso = '<div class="aviso err">' + t("agotado_texto") + '</div>';
-  else if (costo > saldoDisponible()) aviso = '<div class="aviso avi">' + t("saldo_no_alcanza", num(saldoDisponible())) + '</div>';
   $("mp-aviso").innerHTML = aviso;
 
   var btn = $("mp-agregar");
@@ -1636,6 +1985,138 @@ function actualizarContador(){
   el.style.display = n > 0 ? "flex" : "none";
 }
 
+/* ===== Gramos ===== */
+function gramosDe(pid){ return Number(EXTRA.gramos[pid] || EXTRA.gramos[String(pid)] || 0); }
+function numG(n){ return Number(n || 0).toLocaleString(IDIOMA === "es" ? "es-AR" : "en-US", { maximumFractionDigits:2 }); }
+function gramosCarrito(){
+  return carrito.reduce(function(a, i){ return a + gramosDe(i.producto_id) * i.cantidad; }, 0);
+}
+
+/* El mínimo y el máximo cuentan solo lo que se mide en gramos. Un pedido
+   de pura merch o accesorios no tiene mínimo. */
+function problemaGramos(){
+  var g = gramosCarrito(), min = Number(EXTRA.compra.min_g || 0), max = Number(EXTRA.compra.max_g || 0);
+  if (g > 0 && min > 0 && g < min) return t("min_gramos", numG(min), numG(min - g));
+  if (max > 0 && g > max)          return t("max_gramos", numG(max), numG(g - max));
+  return "";
+}
+
+/* ===== Aviso de matrícula arriba del catálogo ===== */
+function pintarAvisoMatricula(){
+  var el = $("aviso-matricula");
+  if (!el) return;
+  var m = EXTRA.matricula;
+  if (m.paga) { el.innerHTML = ""; return; }
+  el.innerHTML = m.pendiente
+    ? '<div class="aviso avi">' + t("matricula_revision") + '</div>'
+    : '<div class="aviso err">' + t("matricula_falta") +
+        '<br><button class="btn btn-sec btn-sm" onclick="ir(\'tokens\')">' + t("matricula_pagar") + '</button></div>';
+}
+
+/* ==========================================================================
+   FORMA DE PAGO
+   La misma pieza sirve para el carrito y para matrícula y membresías.
+   ========================================================================== */
+function pagoHTML(est, conSaldo, total){
+  var ops = [];
+  if (conSaldo) ops.push(["saldo", t("m_saldo"), t("m_saldo_sub", num(socio.saldo_tokens))]);
+  ops.push(["transferencia", t("m_transf"), t("m_transf_sub")]);
+  ops.push(["efectivo", t("m_efectivo"), t("m_efectivo_sub")]);
+
+  var h = '<div class="metodos">' + ops.map(function(o){
+    var off = o[0] === "saldo" && socio.saldo_tokens < total;
+    return '<button type="button" class="metodo" data-metodo="' + o[0] + '" aria-pressed="' +
+           (est.metodo === o[0] ? "true" : "false") + '"' + (off ? " disabled" : "") + '>' +
+           '<span class="punto"></span><span class="txt"><b>' + o[1] + '</b><span>' + o[2] + '</span></span></button>';
+  }).join("") + '</div>';
+
+  if (est.metodo === "transferencia") {
+    h += EXTRA.transferencia
+      ? '<div class="datos-pago"><span class="rot">' + t("datos_transf") + '</span>' + esc(EXTRA.transferencia) + '</div>'
+      : '<div class="aviso neu">' + t("sin_datos_transf") + '</div>';
+
+    var etiqueta = est.leyendo ? t("procesando_archivo")
+                 : (est.archivo ? t("adjunto_listo", esc(est.archivo.nombre)) : t("adjuntar"));
+    h += '<label class="adjunto' + (est.archivo ? " ok" : "") + '">' +
+           '<svg class="ico"><use href="#i-adjunto"/></svg><span>' + etiqueta + '</span>' +
+           '<input type="file" class="in-archivo" accept="image/*,application/pdf" style="display:none">' +
+         '</label>';
+    h += '<div class="campo" style="margin-top:14px">' +
+           '<label>' + t("nro_operacion") + '</label>' +
+           '<input type="text" class="in-operacion" inputmode="text" autocomplete="off" placeholder="' +
+             esc(t("nro_operacion_ph")) + '" value="' + esc(est.operacion) + '">' +
+           '<div style="font-size:11px;color:var(--texto-3);margin-top:6px">' + t("nro_operacion_ayuda") + '</div>' +
+         '</div>';
+  }
+  if (est.metodo === "efectivo") h += '<div class="aviso neu">' + t("efectivo_nota") + '</div>';
+  return h;
+}
+
+function engancharPago(cont, est, repintar){
+  cont.querySelectorAll(".metodo").forEach(function(b){
+    b.onclick = function(){ est.metodo = b.getAttribute("data-metodo"); repintar(); };
+  });
+  var op = cont.querySelector(".in-operacion");
+  if (op) op.oninput = function(){ est.operacion = op.value.trim(); };
+  var fi = cont.querySelector(".in-archivo");
+  if (fi) fi.onchange = async function(){
+    var f = fi.files && fi.files[0];
+    if (!f) return;
+    est.leyendo = true; repintar();
+    try { est.archivo = await leerComprobante(f); }
+    catch(e){ est.archivo = null; toast(e.message || t("err_archivo_tipo")); }
+    est.leyendo = false; repintar();
+  };
+}
+
+/* El comprobante se achica en el celular antes de mandarlo: una foto de
+   4 MB queda en unos 200 KB y se lee igual. Los PDF van tal cual, con tope. */
+function leerComprobante(file){
+  return new Promise(function(ok, mal){
+    var tipo = file.type || "";
+    if (tipo === "application/pdf") {
+      if (file.size > 1200000) { mal(new Error(t("err_archivo_grande"))); return; }
+      var fr = new FileReader();
+      fr.onload = function(){ ok({ datos:String(fr.result).split(",")[1], mime:"application/pdf", nombre:file.name }); };
+      fr.onerror = function(){ mal(new Error(t("err_archivo_tipo"))); };
+      fr.readAsDataURL(file);
+      return;
+    }
+    if (tipo.indexOf("image/") !== 0) { mal(new Error(t("err_archivo_tipo"))); return; }
+
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function(){
+      var lado = 1400, w = img.naturalWidth, h = img.naturalHeight;
+      var k = Math.min(1, lado / Math.max(w, h));
+      var c = document.createElement("canvas");
+      c.width = Math.round(w * k); c.height = Math.round(h * k);
+      var cx = c.getContext("2d");
+      cx.fillStyle = "#fff"; cx.fillRect(0, 0, c.width, c.height);
+      cx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      var datos = c.toDataURL("image/jpeg", 0.72).split(",")[1];
+      if (datos.length > 1600000) { mal(new Error(t("err_archivo_grande"))); return; }
+      ok({ datos:datos, mime:"image/jpeg", nombre:file.name || "comprobante.jpg" });
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); mal(new Error(t("err_archivo_tipo"))); };
+    img.src = url;
+  });
+}
+
+/* Antes de mandar: lo que se puede revisar en el celular se revisa acá, para
+   no hacer viajar un archivo que la base va a rechazar. La base igual lo
+   vuelve a revisar todo. */
+function errorPago(est){
+  if (["saldo","transferencia","efectivo"].indexOf(est.metodo) < 0) return t("err_metodo");
+  if (est.metodo === "transferencia") {
+    if (est.leyendo) return t("procesando_archivo");
+    if (!est.archivo) return t("err_falta_archivo");
+    if (!est.operacion) return t("err_falta_operacion");
+  }
+  return "";
+}
+
 function pintarCarrito(){
   var cont = $("carrito-cont");
 
@@ -1650,15 +2131,20 @@ function pintarCarrito(){
   }
 
   var total = totalCarrito();
-  var alcanza = total <= socio.saldo_tokens;
+  var gramos = gramosCarrito();
   var pedidosActivos = config.pedidos_activos !== "false";
   var notaPrevia = $("in-nota") ? $("in-nota").value : "";
 
+  /* Si el saldo ya no alcanza, el método "saldo" no se puede elegir. */
+  if (pagoCarrito.metodo === "saldo" && socio.saldo_tokens < total) pagoCarrito.metodo = "transferencia";
+
   var html = carrito.map(function(i, idx){
+    var g = gramosDe(i.producto_id);
     return '<div class="renglon">' +
              '<div class="info">' +
                '<h4>' + esc(i.nombre) + '</h4>' +
-               '<div class="sub">' + t("cada_uno", num(i.precio_tokens)) + '</div>' +
+               '<div class="sub">' + t("cada_uno", num(i.precio_tokens)) +
+                 (g > 0 ? ' · ' + t("gramos_u", numG(g * i.cantidad)) : '') + '</div>' +
                tokHTML(i.precio_tokens * i.cantidad) +
              '</div>' +
              '<div class="cant">' +
@@ -1670,21 +2156,34 @@ function pintarCarrito(){
   }).join("");
 
   html += '<div class="cuenta">' +
-            '<div class="linea"><span class="rotulo">' + t("saldo") + '</span>' + tokHTML(socio.saldo_tokens) + '</div>' +
+            (gramos > 0 ? '<div class="linea gramos-linea"><span class="rotulo">' + t("gramos_total") + '</span><b>' + t("gramos_u", numG(gramos)) + '</b></div>' : '') +
             '<div class="linea total"><span class="rotulo">' + t("total") + '</span>' + tokHTML(total) + '</div>' +
           '</div>';
 
-  if (!alcanza) html += '<div class="aviso err">' + t("faltan", num(total - socio.saldo_tokens)) + '</div>';
-  else if (!pedidosActivos) html += '<div class="aviso avi">' + t("pedidos_pausados") + '</div>';
-  else html += '<div class="aviso neu">' + t("quedaran", num(socio.saldo_tokens - total)) + '</div>';
+  var bloqueo = "";
+  var m = EXTRA.matricula;
+  if (!m.paga) bloqueo = m.pendiente ? t("matricula_revision") : t("matricula_falta");
+  else if (!pedidosActivos) bloqueo = t("pedidos_pausados");
+  else bloqueo = problemaGramos();
+
+  if (bloqueo) html += '<div class="aviso ' + (m.paga ? "avi" : "err") + '">' + bloqueo + '</div>';
+
+  html += '<h3 class="sec-pago">' + t("forma_pago") + '</h3>' +
+          '<div id="pago-carrito">' + pagoHTML(pagoCarrito, socio.saldo_tokens > 0, total) + '</div>';
+
+  if (pagoCarrito.metodo === "saldo")
+    html += '<div class="aviso neu">' + t("quedaran", num(socio.saldo_tokens - total)) + '</div>';
 
   html += '<div class="campo" style="margin-top:6px">' +
             '<label for="in-nota">' + t("nota_label") + '</label>' +
             '<textarea id="in-nota" rows="2" placeholder="' + esc(t("nota_ph")) + '">' + esc(notaPrevia) + '</textarea>' +
           '</div>';
 
-  html += '<button class="btn" id="btn-confirmar"' + (!alcanza || !pedidosActivos ? ' disabled' : '') + '>' +
-            t("confirmar_pedido", num(total)) + '</button>';
+  var textoBoton = pagoCarrito.metodo === "transferencia" ? t("enviar_pedido_transf")
+                 : pagoCarrito.metodo === "efectivo"      ? t("enviar_pedido_efectivo")
+                 : t("confirmar_pedido", num(total));
+  html += '<button class="btn" id="btn-confirmar"' + (bloqueo || pagoCarrito.leyendo ? ' disabled' : '') + '>' +
+            textoBoton + '</button>';
   html += '<button class="btn btn-linea" style="margin:10px 0 30px" id="btn-vaciar">' + t("vaciar") + '</button>';
 
   cont.innerHTML = html;
@@ -1694,6 +2193,9 @@ function pintarCarrito(){
   });
   cont.querySelectorAll("[data-mas]").forEach(function(b){
     b.onclick = function(){ cambiarCantidad(Number(b.getAttribute("data-mas")), 1); };
+  });
+  engancharPago($("pago-carrito"), pagoCarrito, function(){
+    var y = window.scrollY; pintarCarrito(); window.scrollTo(0, y);
   });
   var bc = $("btn-confirmar"); if (bc) bc.onclick = confirmarPedido;
   $("btn-vaciar").onclick = function(){
@@ -1728,6 +2230,10 @@ function cambiarCantidad(idx, delta){
    ========================================================================== */
 async function confirmarPedido(){
   if (procesando || !carrito.length) return;
+
+  var problema = errorPago(pagoCarrito);
+  if (problema) { toast(problema); return; }
+
   procesando = true;
 
   var btn = $("btn-confirmar");
@@ -1739,13 +2245,20 @@ async function confirmarPedido(){
     });
 
     var notaEl = $("in-nota");
-    var r = await rpc("fn_socio_pedido", {
+    var metodo = pagoCarrito.metodo;
+    var conArchivo = metodo === "transferencia" && pagoCarrito.archivo;
+    var r = await rpc("fn_socio_compra", {
       p_token: TOKEN,
       p_items: items,
-      p_nota: notaEl && notaEl.value.trim() ? notaEl.value.trim() : null
+      p_nota: notaEl && notaEl.value.trim() ? notaEl.value.trim() : null,
+      p_metodo: metodo,
+      p_operacion: metodo === "transferencia" ? pagoCarrito.operacion : null,
+      p_archivo: conArchivo ? pagoCarrito.archivo.datos : null,
+      p_mime: conArchivo ? pagoCarrito.archivo.mime : null
     });
 
     carrito = [];
+    pagoCarrito = { metodo:"transferencia", operacion:"", archivo:null, leyendo:false };
     actualizarContador();
     if (notaEl) notaEl.value = "";
 
@@ -1753,9 +2266,15 @@ async function confirmarPedido(){
     pintarColecciones();
     pintarProductos();
 
+    var espera = r.estado === "esperando_pago";
+    $("exito-titulo").textContent = espera ? t("pedido_recibido") : t("pedido_confirmado");
     $("exito-num").textContent = t("numero", nroPedido(r.id));
     $("exito-total").textContent = num(r.total);
     $("exito-saldo").textContent = num(socio.saldo_tokens);
+    $("exito-linea-saldo").style.display = espera ? "none" : "";
+    $("exito-aviso").innerHTML = espera
+      ? '<div class="aviso avi">' + (metodo === "efectivo" ? t("exito_efectivo") : t("exito_transf")) + '</div>'
+      : "";
     ir("exito");
 
   } catch(e){
@@ -1804,9 +2323,17 @@ async function cargarPedidos(){
              '<span class="cifra">' + num(i.subtotal) + '</span></div>';
     }).join("");
 
-    var accion = p.estado === "pendiente"
+    var pago = pagoDePedido(p.id);
+    var cancelable = p.estado === "esperando_pago" || (p.estado === "pendiente" && !pago);
+    var accion = cancelable
       ? '<button class="btn btn-peligro btn-sm" data-cancelar="' + p.id + '">' + t("cancelar_pedido") + '</button>'
       : '';
+
+    var extraPago = "";
+    if (pago && p.estado === "esperando_pago")
+      extraPago = '<div class="info-pago">' + (pago.metodo === "efectivo" ? t("info_efectivo") : t("info_transf")) + '</div>';
+    if (pago && pago.estado === "rechazado")
+      extraPago = '<div class="motivo">' + (pago.motivo ? t("pago_rechazado", esc(pago.motivo)) : t("pago_rechazado_sin")) + '</div>';
 
     return '<div class="pedido">' +
              '<div class="cab">' +
@@ -1819,6 +2346,7 @@ async function cargarPedidos(){
              '</div>' +
              '<div class="items">' + filas + '</div>' +
              (p.nota ? '<div class="nota">' + esc(p.nota) + '</div>' : '') +
+             extraPago +
              '<div class="pie">' + tokHTML(p.total_tokens) + accion + '</div>' +
            '</div>';
   }).join("");
@@ -1829,21 +2357,26 @@ async function cargarPedidos(){
       var p = lista.filter(function(x){ return x.id === id; })[0];
       confirmar(
         t("cancelar_titulo", nroPedido(id)),
-        t("cancelar_texto", num(p.total_tokens)),
+        p.estado === "esperando_pago" ? t("cancelar_texto_reserva") : t("cancelar_texto", num(p.total_tokens)),
         function(){ cancelarPedido(p); }
       );
     };
   });
 }
 
+function pagoDePedido(id){
+  return EXTRA.pagos.filter(function(x){ return x.concepto === "pedido" && Number(x.pedido_id) === Number(id); })[0] || null;
+}
+
 async function cancelarPedido(p){
   try {
-    await rpc("fn_socio_pedido_cancelar", { p_token:TOKEN, p_pedido_id:p.id });
+    var r = await rpc("fn_socio_cancelar", { p_token:TOKEN, p_pedido_id:p.id });
     await sincronizar();
     await cargarPedidos();
     pintarColecciones();
     pintarProductos();
-    toast(t("cancelado_ok", num(p.total_tokens)));
+    var dev = r && r.devuelto ? Number(r.devuelto) : 0;
+    toast(dev > 0 ? t("cancelado_ok", num(dev)) : t("cancelado_reserva_ok"));
   } catch(e){
     toast(e.message || t("err_cancelar"));
   }
@@ -1855,6 +2388,8 @@ async function cancelarPedido(p){
    ========================================================================== */
 async function cargarTokens(){
   await refrescarSocio();
+  pintarMatriculaYPlanes();
+  pintarPagos();
 
   var cont = $("movs-cont");
   cont.innerHTML = '<div class="cargando" style="padding:24px 0">' + t("cargando") + '</div>';
@@ -1894,6 +2429,129 @@ async function cargarTokens(){
            '</div>';
   }).join("");
 }
+
+/* ===== Matrícula y membresías en la pantalla de Tokens ===== */
+function pintarMatriculaYPlanes(){
+  var m = EXTRA.matricula;
+  var bm = $("bloque-matricula");
+  if (m.paga) bm.innerHTML = "";
+  else bm.innerHTML =
+    '<div class="bloque">' +
+      '<h3>' + t("matricula") + '</h3>' +
+      '<p class="bajada">' + t("matricula_bajada") + '</p>' +
+      '<div class="plan"><div><div class="n">' + tokHTML(m.tokens) + '</div></div>' +
+        (m.pendiente
+          ? '<span class="marca-estado e-avi">' + t("membresia_revision") + '</span>'
+          : '<button class="btn btn-sm" id="btn-matricula">' + t("matricula_pagar") + '</button>') +
+      '</div>' +
+    '</div>';
+  var b1 = $("btn-matricula");
+  if (b1) b1.onclick = function(){ abrirPago("matricula", null); };
+
+  var bp = $("bloque-membresias");
+  var planes = EXTRA.membresias || [];
+  if (!planes.length) { bp.innerHTML = ""; return; }
+
+  var enRevision = {};
+  EXTRA.pagos.forEach(function(x){
+    if (x.concepto === "membresia" && x.estado === "pendiente") enRevision[x.membresia_id] = true;
+  });
+
+  bp.innerHTML =
+    '<div class="bloque">' +
+      '<h3>' + t("membresias") + '</h3>' +
+      '<p class="bajada">' + t("membresias_bajada") + '</p>' +
+      planes.map(function(pl){
+        return '<div class="plan"><div><div class="n">' + esc(pl.nombre) + '</div>' +
+                 '<div class="d">' + t("membresia_d", numG(pl.gramos), num(pl.tokens)) + '</div></div>' +
+               (enRevision[pl.id]
+                 ? '<span class="marca-estado e-avi">' + t("membresia_revision") + '</span>'
+                 : '<button class="btn btn-sec btn-sm" data-plan="' + pl.id + '">' + t("membresia_contratar") + '</button>') +
+               '</div>';
+      }).join("") +
+    '</div>';
+
+  bp.querySelectorAll("[data-plan]").forEach(function(b){
+    b.onclick = function(){ abrirPago("membresia", Number(b.getAttribute("data-plan"))); };
+  });
+}
+
+function pintarPagos(){
+  var cont = $("pagos-cont");
+  var lista = EXTRA.pagos || [];
+  if (!lista.length) { cont.innerHTML = '<div class="cargando" style="padding:18px 0">' + t("sin_pagos") + '</div>'; return; }
+
+  var clase = { pendiente:"e-avi", aprobado:"e-ok", rechazado:"e-err", cancelado:"e-neu" };
+  cont.innerHTML = lista.map(function(x){
+    var que = x.concepto === "pedido" ? t("p_pedido", nroPedido(x.pedido_id))
+            : x.concepto === "matricula" ? t("p_matricula")
+            : esc(x.membresia_nombre || t("membresias"));
+    return '<div class="pago"><div>' +
+             '<div class="q">' + que + '</div>' +
+             '<div class="f">' + fecha(x.created_at) + ' · ' + t("pm_" + x.metodo) + ' · ' + num(x.tokens) + ' tokens</div>' +
+             (x.estado === "rechazado" && x.motivo ? '<div class="motivo">' + esc(x.motivo) + '</div>' : '') +
+           '</div><span class="marca-estado ' + (clase[x.estado] || "e-neu") + '">' + t("pe_" + x.estado) + '</span></div>';
+  }).join("");
+}
+
+/* ===== Modal de pago de matrícula o membresía ===== */
+function abrirPago(concepto, membresiaId){
+  pagoModal = { metodo:"transferencia", operacion:"", archivo:null, leyendo:false,
+                concepto:concepto, membresia:membresiaId };
+  pintarModalPago();
+  abrirModal("modal-pago");
+}
+
+function pintarModalPago(){
+  var est = pagoModal, total = 0;
+  if (est.concepto === "matricula") {
+    total = EXTRA.matricula.tokens;
+    $("mpg-titulo").textContent = t("matricula_titulo");
+    $("mpg-texto").textContent = t("matricula_texto");
+  } else {
+    var pl = EXTRA.membresias.filter(function(x){ return x.id === est.membresia; })[0];
+    if (!pl) { cerrarModal("modal-pago"); return; }
+    total = pl.tokens;
+    $("mpg-titulo").textContent = t("membresia_titulo", pl.nombre);
+    $("mpg-texto").textContent = t("membresia_texto", numG(pl.gramos), num(pl.tokens));
+  }
+  $("mpg-total").innerHTML = tokHTML(total);
+  $("mpg-form").innerHTML = pagoHTML(est, false, total);
+  $("mpg-error").innerHTML = "";
+  engancharPago($("mpg-form"), est, pintarModalPago);
+  var b = $("mpg-enviar");
+  b.textContent = t("enviar_pago");
+  b.disabled = est.leyendo;
+}
+
+$("mpg-enviar").onclick = async function(){
+  var est = pagoModal;
+  var problema = errorPago(est);
+  if (problema) { $("mpg-error").innerHTML = '<div class="aviso err">' + problema + '</div>'; return; }
+
+  var b = $("mpg-enviar");
+  b.disabled = true; b.textContent = t("confirmando");
+  try {
+    var conArchivo = est.metodo === "transferencia" && est.archivo;
+    await rpc("fn_socio_pago", {
+      p_token: TOKEN,
+      p_concepto: est.concepto,
+      p_membresia_id: est.concepto === "membresia" ? est.membresia : null,
+      p_metodo: est.metodo,
+      p_operacion: est.metodo === "transferencia" ? est.operacion : null,
+      p_archivo: conArchivo ? est.archivo.datos : null,
+      p_mime: conArchivo ? est.archivo.mime : null
+    });
+    cerrarModal("modal-pago");
+    toast(t("pago_enviado"));
+    await sincronizar();
+    await cargarTokens();
+  } catch(e){
+    $("mpg-error").innerHTML = '<div class="aviso err">' + esc(e.message || t("err_servidor")) + '</div>';
+  } finally {
+    b.disabled = false; b.textContent = t("enviar_pago");
+  }
+};
 
 async function canjearCodigo(){
   var input = $("in-codigo");

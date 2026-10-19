@@ -329,6 +329,9 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 .mini{width:34px;height:34px;object-fit:cover;border:1px solid var(--borde);display:block}
 .mini-vacia{width:34px;height:34px;border:1px dashed var(--borde-2);display:block}
 
+.aviso-config{border:1px solid var(--err) !important;background:var(--err-bg);color:var(--err) !important;
+  padding:14px 16px;line-height:1.6}
+
 #toast{
   position:fixed;left:50%;bottom:26px;transform:translate(-50%,18px);
   background:var(--negro);color:var(--blanco);padding:13px 20px;
@@ -354,6 +357,29 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
   .modal .caja{max-height:94vh}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* ==========================================================================
+   PAGOS, VENTA EN EL LOCAL Y STOCK
+   ========================================================================== */
+.comprobante{border:1px solid var(--linea);background:var(--marfil);padding:12px;margin-top:16px;text-align:center}
+.comprobante img{max-width:100%;max-height:62vh;display:block;margin:0 auto}
+.comprobante iframe{width:100%;height:62vh;border:0;background:#fff}
+.comprobante .acc{margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.socio-venta{border:1px solid var(--linea);padding:14px 16px;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;margin-top:4px;background:var(--marfil)}
+.socio-venta .n{font-family:var(--serif);font-weight:700;font-size:17px}
+.socio-venta .d{font-size:11px;color:var(--texto-3);margin-top:2px}
+.linea-venta{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--linea-suave);font-size:13px}
+.linea-venta:last-child{border-bottom:none}
+.totales-venta{border-top:1px solid var(--negro);margin:10px 0 16px;padding-top:12px}
+.totales-venta .dato{border:none;padding:4px 0}
+.nota-hist{border-left:2px solid var(--oro);padding:8px 12px;margin-bottom:10px;background:var(--marfil)}
+.nota-hist .q{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--texto-3);font-weight:600}
+.nota-hist .x{font-size:13px;margin-top:3px;white-space:pre-line}
+.dif-pos{color:var(--ok);font-weight:600}
+.dif-neg{color:var(--err);font-weight:600}
+#inicio-avisos .aviso{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -403,6 +429,15 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
   <symbol id="i-menos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
     <path d="M5 12h14"/>
   </symbol>
+  <symbol id="i-pagos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="3" y="6" width="18" height="12"/><path d="M3 10h18"/><path d="M7 14.5h4"/>
+  </symbol>
+  <symbol id="i-venta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M4 9h16l-1.4 11H5.4L4 9Z"/><path d="M8.5 9V7a3.5 3.5 0 0 1 7 0v2"/>
+  </symbol>
+  <symbol id="i-stock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 3 20.5 7.5v9L12 21l-8.5-4.5v-9L12 3Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>
+  </symbol>
 </svg>
 
 <!-- ============================ LOGIN ============================ -->
@@ -431,7 +466,6 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 <!-- ============================ APP ============================ -->
 <div id="app">
 
-  <div class="cinta" id="cinta-demo" data-t="cinta_demo">Modo demo</div>
 
   <aside class="lateral" id="lateral">
     <div class="marca">
@@ -442,8 +476,11 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
     <nav id="nav">
       <button data-ir="inicio" data-rol="administrador" class="activo"><svg class="ico"><use href="#i-panel"/></svg><span data-t="nav_inicio">Panel general</span></button>
       <button data-ir="pedidos"><svg class="ico"><use href="#i-pedidos"/></svg><span data-t="nav_pedidos">Pedidos</span><span class="pill" id="pill-pedidos" style="display:none">0</span></button>
-      <button data-ir="socios"><svg class="ico"><use href="#i-socios"/></svg><span data-t="nav_socios">Socios</span></button>
-      <button data-ir="tokens"><svg class="ico"><use href="#i-token"/></svg><span data-t="nav_tokens">Tokens</span></button>
+      <button data-ir="pagos" data-rol="administrador"><svg class="ico"><use href="#i-pagos"/></svg><span data-t="nav_pagos">Pagos</span><span class="pill" id="pill-pagos" style="display:none">0</span></button>
+      <button data-ir="venta"><svg class="ico"><use href="#i-venta"/></svg><span data-t="nav_venta">Venta en el local</span></button>
+      <button data-ir="stock"><svg class="ico"><use href="#i-stock"/></svg><span data-t="nav_stock">Stock</span><span class="pill" id="pill-stock" style="display:none">0</span></button>
+      <button data-ir="socios" data-rol="administrador"><svg class="ico"><use href="#i-socios"/></svg><span data-t="nav_socios">Socios</span></button>
+      <button data-ir="tokens" data-rol="administrador"><svg class="ico"><use href="#i-token"/></svg><span data-t="nav_tokens">Tokens</span></button>
       <button data-ir="catalogo" data-rol="administrador"><svg class="ico"><use href="#i-catalogo"/></svg><span data-t="nav_catalogo">Catálogo</span></button>
       <button data-ir="reportes" data-rol="administrador"><svg class="ico"><use href="#i-conta"/></svg><span data-t="nav_conta">Contabilidad</span></button>
       <button data-ir="usuarios" data-rol="administrador"><svg class="ico"><use href="#i-usuarios"/></svg><span data-t="nav_usuarios">Usuarios</span></button>
@@ -471,6 +508,7 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 
     <!-- ---------------- PANEL GENERAL (solo administrador) ---------------- -->
     <section class="seccion activa" id="sec-inicio">
+      <div id="inicio-avisos"></div>
       <div class="kpis">
         <div class="kpi"><div class="rot" data-t="k_pedidos">Pedidos abiertos</div><div class="val" id="k-pedidos">—</div><div class="pie" id="k-pedidos-pie">&nbsp;</div></div>
         <div class="kpi"><div class="rot" data-t="k_socios">Socios activos</div><div class="val" id="k-socios">—</div><div class="pie" id="k-socios-pie">&nbsp;</div></div>
@@ -518,6 +556,7 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
           <select id="f-ped-estado">
             <option value="abiertos" data-t="f_abiertos">Abiertos</option>
             <option value="" data-t="f_todos">Todos</option>
+            <option value="esperando_pago" data-t="e_esperando_pago" data-rol="administrador">Esperando pago</option>
             <option value="pendiente" data-t="e_pendiente">Pendiente</option>
             <option value="preparando" data-t="e_preparando">Preparando</option>
             <option value="listo" data-t="e_listo">Listo</option>
@@ -532,10 +571,108 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
       <div class="tabla-wrap"><table>
         <thead><tr>
           <th data-t="th_pedido">Pedido</th><th data-t="th_socio">Socio</th><th data-t="th_items">Items</th>
-          <th class="num" data-t="th_tokens">Tokens</th><th data-t="th_estado">Estado</th><th data-t="th_fecha">Fecha</th><th class="acc"></th>
+          <th class="num" data-rol="administrador" data-t="th_tokens">Tokens</th><th data-t="th_estado">Estado</th><th data-t="th_fecha">Fecha</th><th class="acc"></th>
         </tr></thead>
         <tbody id="tb-pedidos"></tbody>
       </table></div>
+    </section>
+
+    <!-- ---------------- PAGOS (solo administrador) ---------------- -->
+    <section class="seccion" id="sec-pagos">
+      <div class="aviso a-info" data-t="pagos_aviso">Acá llegan los comprobantes de transferencia y los pagos en efectivo. Mientras no los apruebes, el pedido no pasa a envíos y la matrícula o la membresía no se acreditan.</div>
+      <div class="tabs" id="tabs-pagos">
+        <button data-tabpago="pendientes" class="activo"><span data-t="pag_pendientes">Por revisar</span> <span id="n-pagos-pend"></span></button>
+        <button data-tabpago="historial" data-t="pag_historial">Historial</button>
+      </div>
+      <div class="filtros">
+        <div class="campo"><label for="f-pag-concepto" data-t="pag_concepto">Concepto</label>
+          <select id="f-pag-concepto">
+            <option value="" data-t="f_todos">Todos</option>
+            <option value="pedido" data-t="pc_pedido_pl">Pedidos</option>
+            <option value="matricula" data-t="pc_matricula">Matrícula</option>
+            <option value="membresia" data-t="pc_membresia_pl">Membresías</option>
+          </select>
+        </div>
+        <div class="campo"><label for="f-pag-metodo" data-t="pag_metodo">Método</label>
+          <select id="f-pag-metodo">
+            <option value="" data-t="f_todos">Todos</option>
+            <option value="transferencia" data-t="pm_transferencia">Transferencia</option>
+            <option value="efectivo" data-t="pm_efectivo">Efectivo</option>
+          </select>
+        </div>
+        <div class="campo crecer"><label for="f-pag-buscar" data-t="f_buscar">Buscar</label><input id="f-pag-buscar" data-tph="f_buscar_pago_ph"></div>
+      </div>
+      <div class="tabla-wrap"><table>
+        <thead><tr>
+          <th data-t="th_fecha">Fecha</th><th data-t="th_socio">Socio</th><th data-t="pag_concepto">Concepto</th>
+          <th data-t="pag_metodo">Método</th><th data-t="pag_operacion">Operación</th>
+          <th class="num" data-t="th_tokens">Tokens</th><th data-t="th_estado">Estado</th><th class="acc"></th>
+        </tr></thead>
+        <tbody id="tb-pagos"></tbody>
+      </table></div>
+    </section>
+
+    <!-- ---------------- VENTA EN EL LOCAL (los dos roles) ---------------- -->
+    <section class="seccion" id="sec-venta">
+      <div class="panel" style="max-width:660px">
+        <h3 class="filete" data-t="v_socio_titulo">Socio</h3>
+        <div class="sub" data-t="v_socio_bajada">Buscalo por DNI. Solo vas a ver su nombre.</div>
+        <div class="fila-campos" style="align-items:flex-end">
+          <div class="campo"><label for="v-dni" data-t="f_dni">DNI</label><input id="v-dni" inputmode="numeric" autocomplete="off"></div>
+          <div class="campo" style="flex:0 0 auto"><button class="btn" id="v-buscar" data-t="v_buscar">Buscar</button></div>
+        </div>
+        <div id="v-socio"></div>
+      </div>
+      <div class="panel" style="max-width:660px" id="v-panel-items">
+        <h3 class="filete" data-t="v_items_titulo">Lo que se lleva</h3>
+        <div class="fila-campos" style="align-items:flex-end">
+          <div class="campo" style="flex:2 1 220px"><label for="v-prod" data-t="th_producto">Producto</label><select id="v-prod"></select></div>
+          <div class="campo" style="flex:0 1 110px"><label for="v-cant" data-t="f_cantidad">Cantidad</label><input type="number" id="v-cant" min="1" step="1" value="1" inputmode="numeric"></div>
+          <div class="campo" style="flex:0 0 auto"><button class="btn btn-sec" id="v-agregar" data-t="agregar">Agregar</button></div>
+        </div>
+        <div id="v-items"></div>
+        <div class="campo"><label for="v-nota" data-t="v_nota">Nota (opcional)</label><input id="v-nota"></div>
+        <div class="aviso a-info" data-t="v_aviso">Se cobra en efectivo en el momento. La venta queda registrada como entregada y el administrador confirma el cobro cuando hace la caja.</div>
+        <button class="btn btn-full" id="v-registrar" data-t="v_registrar">Registrar venta</button>
+      </div>
+    </section>
+
+    <!-- ---------------- STOCK (los dos roles) ---------------- -->
+    <section class="seccion" id="sec-stock">
+      <div class="panel" style="max-width:660px" data-rol="administrador">
+        <h3 class="filete" data-t="st_cargar_titulo">Cargar stock</h3>
+        <div class="sub" data-t="st_cargar_bajada">Queda pendiente hasta que el empleado confirme lo que llegó. Recién ahí suma al catálogo.</div>
+        <div class="fila-campos">
+          <div class="campo" style="flex:2 1 220px"><label for="st-prod" data-t="th_producto">Producto</label><select id="st-prod"></select></div>
+          <div class="campo" style="flex:0 1 120px"><label for="st-cant" data-t="f_cantidad">Cantidad</label><input type="number" id="st-cant" min="1" step="1" inputmode="numeric"></div>
+        </div>
+        <div class="campo"><label for="st-nota" data-t="v_nota">Nota (opcional)</label><input id="st-nota"></div>
+        <button class="btn" id="st-cargar" data-t="st_cargar">Cargar</button>
+      </div>
+
+      <div class="panel">
+        <h3 class="filete" data-t="st_pend_titulo">Para recibir</h3>
+        <div class="sub" data-t="st_pend_bajada">Contá lo que llegó. Si coincide con lo cargado, tocá Coincide. Si no, anotá cuánto llegó y qué pasó.</div>
+        <div class="tabla-wrap"><table>
+          <thead><tr>
+            <th data-t="th_producto">Producto</th><th class="num" data-t="st_cargado">Cargado</th>
+            <th data-t="th_hecho_por">Hecho por</th><th data-t="th_fecha">Fecha</th><th class="acc"></th>
+          </tr></thead>
+          <tbody id="tb-stock-pend"></tbody>
+        </table></div>
+      </div>
+
+      <div class="panel">
+        <h3 class="filete" data-t="st_hist_titulo">Historial</h3>
+        <div class="tabla-wrap"><table>
+          <thead><tr>
+            <th data-t="th_producto">Producto</th><th class="num" data-t="st_cargado">Cargado</th>
+            <th class="num" data-t="st_recibido">Recibido</th><th class="num" data-t="st_diferencia">Diferencia</th>
+            <th data-t="th_estado">Estado</th><th data-t="th_fecha">Fecha</th><th class="acc"></th>
+          </tr></thead>
+          <tbody id="tb-stock-hist"></tbody>
+        </table></div>
+      </div>
     </section>
 
     <!-- ---------------- SOCIOS ---------------- -->
@@ -550,7 +687,7 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
             <option value="suspendido" data-t="s_suspendido">Suspendido</option>
           </select>
         </div>
-        <button class="btn" id="btn-nuevo-socio" data-t="nuevo_socio">Nuevo socio</button>
+        <button class="btn" id="btn-nuevo-socio" data-rol="administrador" data-t="nuevo_socio">Nuevo socio</button>
       </div>
       <div class="tabla-wrap"><table>
         <thead><tr>
@@ -566,8 +703,8 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
       <div class="tabs" id="tabs-tokens">
         <button data-tab="carga" class="activo" data-t="tab_carga">Cargar</button>
         <button data-tab="descuento" data-t="tab_descuento">Descontar</button>
-        <button data-tab="codigos" data-rol="administrador" data-t="tab_codigos">Códigos de canje</button>
-        <button data-tab="movs" data-t="tab_movs">Movimientos</button>
+        <button data-tab="codigos" data-t="tab_codigos">Códigos de canje</button>
+        <button data-tab="movs" data-rol="administrador" data-t="tab_movs">Movimientos</button>
       </div>
 
       <!-- --- Cargar --- -->
@@ -722,7 +859,7 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 
     <!-- ---------------- USUARIOS DEL PANEL (solo administrador) ---------------- -->
     <section class="seccion" id="sec-usuarios">
-      <div class="aviso a-info" data-t="usuarios_aviso">El administrador ve y hace todo. El empleado trabaja en el mostrador: carga y descuenta tokens, da de alta socios y maneja pedidos. No ve catálogo, contabilidad ni configuración, y no puede crear usuarios.</div>
+      <div class="aviso a-info" data-t="usuarios_aviso"></div>
       <div class="filtros">
         <button class="btn" id="btn-nuevo-usuario" data-t="nuevo_usuario">Nuevo usuario</button>
       </div>
@@ -737,6 +874,31 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 
     <!-- ---------------- CONFIGURACIÓN (solo administrador) ---------------- -->
     <section class="seccion" id="sec-config">
+      <div class="panel" style="max-width:660px">
+        <h3 class="filete" data-t="cfgc_titulo">Compras y pagos</h3>
+        <div class="sub" data-t="cfgc_bajada">Lo que el socio ve y lo que se le exige al comprar.</div>
+        <div class="fila-campos">
+          <div class="campo"><label for="cfg-min" data-t="cfgc_min">Compra mínima (g)</label><input type="number" id="cfg-min" min="0" step="0.5" inputmode="decimal"><div class="ayuda" data-t="cfgc_cero_min">0 = sin mínimo.</div></div>
+          <div class="campo"><label for="cfg-max" data-t="cfgc_max">Compra máxima (g)</label><input type="number" id="cfg-max" min="0" step="0.5" inputmode="decimal"><div class="ayuda" data-t="cfgc_cero_max">0 = sin máximo.</div></div>
+        </div>
+        <div class="fila-campos">
+          <div class="campo"><label for="cfg-mat" data-t="cfgc_mat">Matrícula (tokens)</label><input type="number" id="cfg-mat" min="0" step="1" inputmode="numeric"><div class="ayuda" data-t="cfgc_mat_ayuda">Pago único al asociarse. 0 = no se cobra.</div></div>
+          <div class="campo"><label for="cfg-dias" data-t="cfgc_dias">Días que se guarda un comprobante</label><input type="number" id="cfg-dias" min="7" step="1" inputmode="numeric"><div class="ayuda" data-t="cfgc_dias_ayuda">Después de revisado se borra el archivo. El registro del pago queda.</div></div>
+        </div>
+        <div class="campo"><label for="cfg-transf" data-t="cfgc_transf">Datos para transferir</label><textarea id="cfg-transf" rows="3" data-tph="cfgc_transf_ph"></textarea><div class="ayuda" data-t="cfgc_transf_ayuda">Se le muestran al socio cuando elige pagar por transferencia.</div></div>
+        <button class="btn" id="btn-cfg-compras" data-t="guardar">Guardar</button>
+      </div>
+
+      <div class="panel" style="max-width:660px">
+        <h3 class="filete" data-t="memb_titulo">Membresías</h3>
+        <div class="sub" data-t="memb_bajada">El socio la contrata desde la app. Cuando aprobás el pago, se le acreditan los tokens. Solo se ve si está activa y tiene precio.</div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th data-t="th_nombre">Nombre</th><th class="num" data-t="memb_gramos">Gramos</th><th class="num" data-t="th_tokens">Tokens</th><th data-t="th_estado">Estado</th><th class="acc"></th></tr></thead>
+          <tbody id="tb-membresias"></tbody>
+        </table></div>
+        <div class="filtros" style="margin:14px 0 0"><button class="btn btn-sec" id="btn-nueva-membresia" data-t="memb_nueva">Nueva membresía</button></div>
+      </div>
+
       <div class="panel" style="max-width:660px">
         <h3 class="filete" data-t="cfg_titulo">Parámetros del club</h3>
         <div class="sub" data-t="cfg_bajada">Estos valores los lee el panel de socios. Editá y guardá cada uno.</div>
@@ -831,7 +993,7 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
   <div class="cab"><h3 id="mf-titulo">—</h3><button class="x" data-cerrar="modal-ficha"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
   <div class="cuerpo" id="mf-cuerpo"></div>
   <div class="pie">
-    <button class="btn btn-linea" id="mf-editar" data-t="editar_datos">Editar datos</button>
+    <button class="btn btn-linea" id="mf-editar" data-rol="administrador" data-t="editar_datos">Editar datos</button>
     <button class="btn btn-sec" id="mf-descuento" data-t="ac_descuento">Descontar tokens</button>
     <button class="btn" id="mf-cargar" data-t="ac_carga">Cargar tokens</button>
   </div>
@@ -898,6 +1060,9 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
       <div class="campo"><label for="p-stock" data-t="th_stock">Stock</label><input type="number" id="p-stock" min="0" step="1" inputmode="numeric"></div>
     </div>
     <div class="fila-campos">
+      <div class="campo"><label for="p-gramos" data-t="f_gramos">Gramos por unidad</label><input type="number" id="p-gramos" min="0" step="0.5" inputmode="decimal"><div class="ayuda" data-t="f_gramos_ayuda">0 si no se mide en gramos (merch, accesorios). Cuenta para el mínimo y el máximo de compra.</div></div>
+    </div>
+    <div class="fila-campos">
       <div class="campo"><label for="p-orden" data-t="f_orden">Orden en la colección</label><input type="number" id="p-orden" min="0" step="1" inputmode="numeric"></div>
       <div class="campo"><label for="p-activo" data-t="f_visible">Visible para los socios</label>
         <select id="p-activo"><option value="true" data-t="si">Sí</option><option value="false" data-t="no">No</option></select>
@@ -942,6 +1107,59 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
   </div>
 </div></div>
 
+<div class="modal" id="modal-revisar"><div class="caja ancha">
+  <div class="cab"><h3 id="mr-titulo">—</h3><button class="x" data-cerrar="modal-revisar"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
+  <div class="cuerpo" id="mr-cuerpo"></div>
+  <div class="pie" id="mr-pie"></div>
+</div></div>
+
+<div class="modal" id="modal-recibir"><div class="caja">
+  <div class="cab"><h3 data-t="rc_titulo">No coincide</h3><button class="x" data-cerrar="modal-recibir"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
+  <div class="cuerpo">
+    <div id="rc-datos"></div>
+    <div class="campo" style="margin-top:14px"><label for="rc-cant" data-t="rc_cant">Cantidad que llegó</label><input type="number" id="rc-cant" min="0" step="1" inputmode="numeric"></div>
+    <div class="campo"><label for="rc-nota" data-t="rc_nota">Qué pasó</label><textarea id="rc-nota" rows="3" data-tph="rc_nota_ph"></textarea></div>
+    <div id="rc-error" class="aviso a-err" style="display:none"></div>
+  </div>
+  <div class="pie">
+    <button class="btn btn-linea" data-cerrar="modal-recibir" data-t="cancelar">Cancelar</button>
+    <button class="btn" id="rc-ok" data-t="rc_confirmar">Confirmar recepción</button>
+  </div>
+</div></div>
+
+<div class="modal" id="modal-recepcion"><div class="caja">
+  <div class="cab"><h3 id="mrec-titulo">—</h3><button class="x" data-cerrar="modal-recepcion"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
+  <div class="cuerpo">
+    <div id="mrec-datos"></div>
+    <div class="sub-titulo" data-t="st_notas">Notas</div>
+    <div id="mrec-notas"></div>
+    <div class="campo" style="margin-top:12px"><label for="mrec-nueva" data-t="st_nota_nueva">Agregar una nota</label><textarea id="mrec-nueva" rows="2"></textarea></div>
+  </div>
+  <div class="pie">
+    <button class="btn btn-linea" data-cerrar="modal-recepcion" data-t="cerrar">Cerrar</button>
+    <button class="btn" id="mrec-guardar" data-t="st_nota_guardar">Guardar nota</button>
+  </div>
+</div></div>
+
+<div class="modal" id="modal-membresia"><div class="caja">
+  <div class="cab"><h3 id="mm-titulo" data-t="memb_nueva">Nueva membresía</h3><button class="x" data-cerrar="modal-membresia"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
+  <div class="cuerpo">
+    <div id="mm-error" class="aviso a-err" style="display:none"></div>
+    <div class="campo"><label for="mm-nombre" data-t="th_nombre">Nombre</label><input id="mm-nombre" data-tph="memb_nombre_ph"></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="mm-gramos" data-t="memb_gramos">Gramos</label><input type="number" id="mm-gramos" min="0.5" step="0.5" inputmode="decimal"></div>
+      <div class="campo"><label for="mm-tokens" data-t="memb_tokens">Tokens que acredita</label><input type="number" id="mm-tokens" min="0" step="1" inputmode="numeric"></div>
+    </div>
+    <div class="campo"><label for="mm-activo" data-t="memb_visible">Visible para los socios</label>
+      <select id="mm-activo"><option value="true" data-t="si">Sí</option><option value="false" data-t="no">No</option></select>
+    </div>
+  </div>
+  <div class="pie">
+    <button class="btn btn-linea" data-cerrar="modal-membresia" data-t="cancelar">Cancelar</button>
+    <button class="btn" id="mm-guardar" data-t="guardar">Guardar</button>
+  </div>
+</div></div>
+
 <div class="modal" id="modal-confirm"><div class="caja" style="max-width:420px">
   <div class="cab"><h3 id="mc-titulo">—</h3><button class="x" data-cerrar="modal-confirm"><svg class="ico"><use href="#i-cruz"/></svg></button></div>
   <div class="cuerpo"><div id="mc-texto" style="font-size:13px;line-height:1.6"></div></div>
@@ -964,14 +1182,11 @@ td .sub{display:block;font-size:10.5px;color:var(--texto-3);margin-top:2px}
 var SUPABASE_URL = "https://xndnbdffstwllpdjdjbz.supabase.co";   // ej: https://xxxxxxxx.supabase.co
 var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZG5iZGZmc3R3bGxwZGpkamJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NTE5MzgsImV4cCI6MjEwMzQyNzkzOH0.TcoReQMH1wkim_MoVpJ-yJcuO5RaxhtuVeZsCPjt0qk";   // clave anon / public
 
-/* Modo demo: todo funciona con datos de prueba dentro del archivo, sin tocar
-   la base. Sirve para mostrar el panel o entrenar a alguien sin riesgo.
-   En producción va en false. */
-var MODO_DEMO = false;
-
-/* Si no cargaste las claves todavía, el panel arranca solo en modo demo
-   para no quedarse en blanco. */
-if (!SUPABASE_URL || !SUPABASE_KEY) MODO_DEMO = true;
+/* Este panel trabaja SIEMPRE contra la base real. No existe modo de prueba.
+   Si las dos líneas de arriba están vacías, el panel lo avisa y no deja
+   entrar: un modo de prueba que se enciende solo sería peligroso, porque
+   alguien podría cargar tokens, ver la confirmación, y no haber tocado nada. */
+var CONFIGURADO = !!(SUPABASE_URL && SUPABASE_KEY);
 
 
 var TEXTOS = {
@@ -1029,6 +1244,7 @@ var TEXTOS = {
     sin_resultados:"Nada coincide con el filtro.",
 
     /* --- Estados de pedido (mismas claves que el panel de socios) --- */
+    e_esperando_pago:"Esperando pago",
     e_pendiente:"Pendiente", e_preparando:"Preparando",
     e_listo:"Listo para retirar", e_entregado:"Entregado", e_cancelado:"Cancelado",
 
@@ -1215,9 +1431,9 @@ var TEXTOS = {
     u_activo:"Activo", u_inactivo:"Sin acceso",
     f_nombre_visible:"Nombre visible",
     u_nombre_ph:"Con este nombre firma cada movimiento",
-    usuarios_aviso:"El administrador ve y hace todo. El empleado trabaja en el mostrador: carga y descuenta tokens, da de alta socios y maneja pedidos. No ve catálogo, contabilidad ni configuración, y no puede crear usuarios.",
+    usuarios_aviso:"El administrador ve y hace todo, y es el único que aprueba pagos, carga stock y maneja socios y tokens. El empleado se ocupa de los envíos de los pedidos ya pagados, de la venta en el local y de recibir el stock. No ve socios, tokens, pagos, catálogo, contabilidad ni configuración.",
     nota_rol_admin:"Un administrador puede ver y modificar todo, incluidos los usuarios del panel.",
-    nota_rol_empleado:"Un empleado entra directo a Tokens. Puede cargar, descontar, dar de alta socios y manejar pedidos.",
+    nota_rol_empleado:"Un empleado entra directo a Pedidos. Maneja los envíos de los pedidos pagados, hace ventas en el local y recibe el stock.",
     sin_usuarios:"No hay usuarios cargados.",
     err_falta_nombre_usuario:"Falta el nombre visible.",
     err_usuario_panel_repetido:"Ya existe un usuario \"{0}\" en el panel.",
@@ -1292,8 +1508,131 @@ var TEXTOS = {
     err_foto:"No se pudo procesar la foto.",
     th_foto:"Foto",
     cargando:"Cargando…",
-    demo_ayuda:"Modo demo: los datos son de prueba y no se guardan.<br>Probá con <b>sebastian / admin1234</b> (administrador) o <b>lucia / lucia1234</b> (empleada).",
-    cinta_demo:"Modo demo — los datos no se guardan"
+
+    /* --- Modo operativo y permisos del empleado --- */
+    err_sin_configurar:"Falta configurar la conexión con la base de datos.",
+    sin_configurar_detalle:"Este archivo todavía no tiene la dirección ni la clave de la base. Hay que completar <b>SUPABASE_URL</b> y <b>SUPABASE_KEY</b> en las primeras líneas. Mientras falten, el panel no se conecta con nada.",
+    ficha_solo_saldo:"El historial del socio lo ve un administrador. Acá podés consultar el saldo y cargar o descontar tokens.",
+    err_cod_cantidad_rol:"Podés generar hasta {0} códigos por vez.",
+
+    /* --- Pagos, venta en el local, stock y membresías --- */
+    nav_pagos:"Pagos", nav_venta:"Venta en el local", nav_stock:"Stock",
+    pagos_aviso:"Acá llegan los comprobantes de transferencia y los pagos en efectivo. Mientras no los apruebes, el pedido no pasa a envíos y la matrícula o la membresía no se acreditan.",
+    pag_pendientes:"Por revisar", pag_historial:"Historial",
+    pag_concepto:"Concepto", pag_metodo:"Método", pag_operacion:"Operación",
+    f_buscar_pago_ph:"Socio u operación",
+    pc_pedido:"Pedido {0}", pc_pedido_pl:"Pedidos", pc_matricula:"Matrícula", pc_membresia_pl:"Membresías",
+    pc_venta:"Venta en el local {0}",
+    pm_transferencia:"Transferencia", pm_efectivo:"Efectivo", pm_saldo:"Saldo",
+    pe_pendiente:"Por revisar", pe_aprobado:"Aprobado", pe_rechazado:"Rechazado", pe_cancelado:"Cancelado",
+    pe_faltante:"Faltante",
+    revisar:"Revisar", ver:"Ver",
+    sin_pagos_pend:"No hay pagos por revisar.",
+    rv_titulo:"Pago de {0}",
+    rv_comprobante:"Comprobante",
+    rv_sin_comprobante:"El archivo del comprobante ya no está: se borra solo después de los días configurados.",
+    rv_cargando:"Trayendo el comprobante…",
+    rv_descargar:"Descargar",
+    rv_efectivo:"Pago en efectivo. Confirmalo cuando la plata esté en la caja.",
+    rv_efectivo_local:"Venta hecha en el local por {0}. El producto ya se entregó: confirmá que el efectivo está en la caja.",
+    rv_items:"Qué compró",
+    rv_motivo:"Motivo (obligatorio para rechazar)",
+    rv_motivo_ph:"Ej: el monto no coincide, el comprobante no se lee",
+    rv_aprobar:"Aprobar pago", rv_rechazar:"Rechazar",
+    rv_confirmar_caja:"Confirmar efectivo recibido", rv_faltante:"Marcar faltante",
+    rv_aprobado_ok:"Pago aprobado.", rv_rechazado_ok:"Pago rechazado.",
+    rv_rechazar_titulo:"Rechazar el pago",
+    rv_rechazar_texto:"Si es de un pedido de la app, el pedido se cancela y el stock vuelve al catálogo. El socio ve el motivo.",
+    rv_faltante_texto:"La venta queda entregada y el pago queda marcado como faltante, con el motivo.",
+    rv_revisado:"Revisado por {0} · {1}",
+    rv_por_revisar:"{0} pagos por revisar",
+    rv_ir:"Revisar ahora",
+    p_pago:"Pago", p_ver_pago:"Revisar pago", p_venta_local:"Venta en el local · {0}",
+    err_pedido_sin_pago:"Ese pedido está esperando pago. Para cancelarlo, rechazá el pago en Pagos.",
+    err_pago_resuelto:"Ese pago ya fue revisado.",
+    err_falta_motivo_rechazo:"Escribí el motivo del rechazo: el socio lo va a ver.",
+
+    v_socio_titulo:"Socio", v_socio_bajada:"Buscalo por DNI. Solo vas a ver su nombre.",
+    v_buscar:"Buscar", v_buscando:"Buscando…",
+    v_items_titulo:"Lo que se lleva",
+    v_nota:"Nota (opcional)",
+    v_aviso:"Se cobra en efectivo en el momento. La venta queda registrada como entregada y el administrador confirma el cobro cuando hace la caja.",
+    v_registrar:"Registrar venta",
+    v_sin_items:"Todavía no agregaste productos.",
+    v_total:"Total a cobrar", v_gramos:"Gramos",
+    v_min:"La compra mínima es de {0} g. Faltan {1} g.",
+    v_max:"La compra máxima es de {0} g. Sobran {1} g.",
+    v_socio_inactivo:"Este socio no está activo: no se le puede vender.",
+    v_sin_matricula:"Este socio todavía no tiene la matrícula aprobada: no se le puede vender.",
+    v_otro:"Cambiar",
+    v_elegir:"Elegí un producto",
+    v_quedan:"{0} (quedan {1})",
+    v_ok:"Venta {0} registrada. Cobrá {1} tokens en efectivo.",
+    v_falta_socio:"Primero buscá al socio.",
+    v_sin_stock:"No hay más stock de ese producto.",
+    err_dni_invalido:"Escribí el DNI completo, solo números.",
+    err_socio_no_encontrado:"No hay ningún socio con ese DNI.",
+    err_socio_inactivo:"Ese socio no está activo.",
+    err_matricula_pendiente:"El socio todavía no tiene la matrícula aprobada.",
+    err_minimo_gramos:"La compra mínima es de {0} g.",
+    err_maximo_gramos:"La compra máxima es de {0} g.",
+    err_sin_stock_prod:"Sin stock: {0}",
+    err_carrito_vacio:"Agregá al menos un producto.",
+    err_producto_inexistente:"Uno de los productos ya no está disponible.",
+
+    st_cargar_titulo:"Cargar stock",
+    st_cargar_bajada:"Queda pendiente hasta que el empleado confirme lo que llegó. Recién ahí suma al catálogo.",
+    st_cargar:"Cargar", st_cargado_ok:"Stock cargado. Queda esperando que lo reciban.",
+    st_pend_titulo:"Para recibir",
+    st_pend_bajada:"Contá lo que llegó. Si coincide con lo cargado, tocá Coincide. Si no, anotá cuánto llegó y qué pasó.",
+    st_hist_titulo:"Historial",
+    st_cargado:"Cargado", st_recibido:"Recibido", st_diferencia:"Diferencia",
+    st_coincide:"Coincide", st_no_coincide:"No coincide",
+    se_pendiente:"Por recibir", se_coincide:"Coincide", se_no_coincide:"No coincide",
+    st_sin_pend:"No hay stock por recibir.", st_sin_hist:"Todavía no hay recepciones.",
+    st_elegir:"Elegí un producto",
+    st_coincide_titulo:"Confirmar recepción",
+    st_coincide_texto:"Llegaron {0} de {1}, tal cual se cargó. Se suman al stock.",
+    st_recibido_ok:"Recepción registrada. El stock ya está actualizado.",
+    st_notas:"Notas", st_nota_nueva:"Agregar una nota", st_nota_guardar:"Guardar nota",
+    st_nota_ok:"Nota guardada.", st_sin_notas:"Sin notas.",
+    st_cargado_por:"Cargado por {0} · {1}", st_recibido_por:"Recibido por {0} · {1}",
+    rc_titulo:"No coincide", rc_cant:"Cantidad que llegó", rc_nota:"Qué pasó",
+    rc_nota_ph:"Ej: faltan 2, vinieron 2 rotas",
+    rc_confirmar:"Confirmar recepción",
+    err_falta_nota:"Si no coincide, explicá qué pasó.",
+    err_recepcion_cerrada:"Esa recepción ya se confirmó.",
+    err_falta_producto_st:"Elegí un producto.",
+
+    f_gramos:"Gramos por unidad",
+    f_gramos_ayuda:"0 si no se mide en gramos (merch, accesorios). Cuenta para el mínimo y el máximo de compra.",
+    gramos_u:"{0} g por unidad",
+
+    cfgc_titulo:"Compras y pagos", cfgc_bajada:"Lo que el socio ve y lo que se le exige al comprar.",
+    cfgc_min:"Compra mínima (g)", cfgc_max:"Compra máxima (g)",
+    cfgc_cero_min:"0 = sin mínimo.", cfgc_cero_max:"0 = sin máximo.",
+    cfgc_mat:"Matrícula (tokens)", cfgc_mat_ayuda:"Pago único al asociarse. 0 = no se cobra.",
+    cfgc_dias:"Días que se guarda un comprobante",
+    cfgc_dias_ayuda:"Después de revisado se borra el archivo. El registro del pago queda.",
+    cfgc_transf:"Datos para transferir", cfgc_transf_ph:"Alias, CBU y titular de la cuenta",
+    cfgc_transf_ayuda:"Se le muestran al socio cuando elige pagar por transferencia.",
+    cfgc_ok:"Compras y pagos guardado.",
+    err_min_max:"La compra mínima no puede ser mayor que la máxima.",
+    err_numero:"Revisá los números: no pueden ser negativos.",
+
+    memb_titulo:"Membresías",
+    memb_bajada:"El socio la contrata desde la app. Cuando aprobás el pago, se le acreditan los tokens. Solo se ve si está activa y tiene precio.",
+    memb_nueva:"Nueva membresía", memb_editar:"Editar membresía",
+    memb_gramos:"Gramos", memb_tokens:"Tokens que acredita", memb_visible:"Visible para los socios",
+    memb_nombre_ph:"Ej: Membresía 40 g",
+    memb_activa:"Activa", memb_oculta:"Oculta", memb_sin_precio:"Sin precio",
+    memb_ok:"Membresía guardada.", sin_membresias:"No hay membresías.",
+    err_memb_datos:"Completá el nombre y los gramos.",
+    err_memb_precio:"Para que la vean los socios tiene que tener tokens.",
+
+    mat_titulo:"Matrícula", mat_paga:"Paga", mat_pendiente:"Sin pagar",
+    mat_marcar:"Marcar como paga", mat_desmarcar:"Marcar como no paga",
+    mat_ok:"Matrícula actualizada.", mat_sin:"Sin matrícula"
 }
 };
 
@@ -1354,9 +1693,23 @@ function traducirError(codigo){
     ROL_INVALIDO:"err_servidor", ULTIMO_ADMIN:"err_ultimo_admin",
     UNO_MISMO:"err_uno_mismo", FALTA_CLAVE:"err_cfg_clave",
     PASSWORD_CORTA:"err_pass_corta",
-    FORMATO_INVALIDO:"err_foto_formato", IMAGEN_GRANDE:"err_foto_grande"
+    FORMATO_INVALIDO:"err_foto_formato", IMAGEN_GRANDE:"err_foto_grande",
+    PEDIDO_SIN_PAGO:"err_pedido_sin_pago", PAGO_INEXISTENTE:"err_servidor", PAGO_RESUELTO:"err_pago_resuelto",
+    DNI_INVALIDO:"err_dni_invalido", SOCIO_NO_ENCONTRADO:"err_socio_no_encontrado",
+    SOCIO_INACTIVO:"err_socio_inactivo", MATRICULA_PENDIENTE:"err_matricula_pendiente",
+    MINIMO_GRAMOS:"err_minimo_gramos", MAXIMO_GRAMOS:"err_maximo_gramos",
+    RECEPCION_INEXISTENTE:"err_servidor", RECEPCION_CERRADA:"err_recepcion_cerrada",
+    FALTA_NOTA:"err_falta_nota", MEMBRESIA_INEXISTENTE:"err_servidor",
+    PRODUCTO_INEXISTENTE:"err_producto_inexistente", CARRITO_VACIO:"err_carrito_vacio"
   };
 
+  /* Estos traen un dato que no es un número. */
+  if (clave === "SIN_STOCK") return t("err_sin_stock_prod", partes.slice(1).join(":"));
+  if (clave === "MINIMO_GRAMOS" || clave === "MAXIMO_GRAMOS") return t(mapa[clave], dato);
+
+  /* CANTIDAD_INVALIDA con un número al lado viene del límite de códigos por
+     tanda, que cambia según el rol. Sin número, es la cantidad de tokens. */
+  if (clave === "CANTIDAD_INVALIDA" && dato !== undefined) return t("err_cod_cantidad_rol", dato);
   if (mapa[clave]) return dato !== undefined ? t(mapa[clave], num(dato)) : t(mapa[clave]);
   return t("err_servidor");
 }
@@ -1370,7 +1723,7 @@ function traducirError(codigo){
 var TOKEN = null;
 
 async function rpc(fn, params){
-  if (MODO_DEMO) return demoRPC(fn, params || {});
+  if (!CONFIGURADO) throw new Error(t("err_sin_configurar"));
 
   var r;
   try {
@@ -1418,392 +1771,6 @@ function sesionCaida(){
 
 
 /* ==========================================================================
-   MODO DEMO
-   Imita en JavaScript lo que hacen las funciones de la base, con los mismos
-   nombres, los mismos parámetros y los mismos códigos de error. Sirve para
-   mostrar el panel o entrenar a alguien sin tocar datos reales.
-   Nada de esto corre cuando MODO_DEMO es false.
-   ========================================================================== */
-function _hace(dias, horas){
-  var d = new Date();
-  d.setDate(d.getDate() - (dias || 0));
-  d.setHours(d.getHours() - (horas || 0));
-  return d.toISOString();
-}
-
-var DEMO = {
-  usuarios_panel: [
-    { id:1, usuario:"sebastian", password:"admin1234", nombre:"Sebastián", rol:"administrador", activo:true, created_at:_hace(60) },
-    { id:2, usuario:"lucia",     password:"lucia1234", nombre:"Lucía",     rol:"empleado",      activo:true, created_at:_hace(20) }
-  ],
-  configuracion: [
-    { id:1, clave:"club_nombre",        valor:"House of Aficionado", descripcion:"Nombre del club." },
-    { id:2, clave:"club_telefono",      valor:"",           descripcion:"Teléfono de contacto." },
-    { id:3, clave:"club_direccion",     valor:"",           descripcion:"Dirección del local." },
-    { id:4, clave:"valor_token",        valor:"",           descripcion:"Cuánto vale 1 token. Uso interno, NO se muestra al socio." },
-    { id:5, clave:"mensaje_bienvenida", valor:"Bienvenido", descripcion:"Texto que ve el socio al entrar." },
-    { id:6, clave:"pedidos_activos",    valor:"true",       descripcion:"Si es false, el socio no puede confirmar pedidos." }
-  ],
-  socios: [
-    { id:1, nombre:"Martín", apellido:"Álvarez", usuario:"martin", email:"martin@ejemplo.com", telefono:"11 5555-1111", dni:"30111222", saldo_tokens:850, estado:"activo", notas:null, created_at:_hace(40) },
-    { id:2, nombre:"Carla",  apellido:"Duarte",  usuario:"carla",  email:"carla@ejemplo.com",  telefono:"11 5555-2222", dni:"32333444", saldo_tokens:60,  estado:"activo", notas:null, created_at:_hace(25) },
-    { id:3, nombre:"Diego",  apellido:"Ferrer",  usuario:"diego",  email:"diego@ejemplo.com",  telefono:"11 5555-3333", dni:"28555666", saldo_tokens:200, estado:"inactivo", notas:null, created_at:_hace(60) }
-  ],
-  productos: [
-    { id:1,  nombre:"Flor Índica",      descripcion:"Variedad relajante. Efecto corporal.", categoria:"flores",      precio_tokens:120, stock:25, activo:true, orden:1, tiene_imagen:false },
-    { id:2,  nombre:"Flor Sativa",      descripcion:"Variedad energizante. Efecto mental.", categoria:"flores",      precio_tokens:120, stock:18, activo:true, orden:2, tiene_imagen:false },
-    { id:3,  nombre:"Hash Tradicional", descripcion:"Prensado artesanal.",                  categoria:"hash",        precio_tokens:200, stock:10, activo:true, orden:1, tiene_imagen:false },
-    { id:4,  nombre:"Brownie",          descripcion:"Porción individual.",                  categoria:"comestibles", precio_tokens:90,  stock:15, activo:true, orden:1, tiene_imagen:false },
-    { id:5,  nombre:"Papelillos",       descripcion:"Caja de 50 unidades.",                 categoria:"accesorios",  precio_tokens:25,  stock:60, activo:true, orden:1, tiene_imagen:false },
-    { id:6,  nombre:"Remera del club",  descripcion:"Algodón, talles S al XL.",             categoria:"merch",       precio_tokens:350, stock:9,  activo:true, orden:1, tiene_imagen:false }
-  ],
-  pedidos: [
-    { id:1, socio_id:1, socio_nombre:"Martín Álvarez", total_tokens:265, estado:"entregado", created_at:_hace(12), entregado_en:_hace(11), cancelado_en:null, nota:null,
-      items:[{producto_id:1, nombre:"Flor Índica", cantidad:2, precio_tokens:120, subtotal:240},
-             {producto_id:5, nombre:"Papelillos", cantidad:1, precio_tokens:25, subtotal:25}] },
-    { id:2, socio_id:1, socio_nombre:"Martín Álvarez", total_tokens:270, estado:"listo", created_at:_hace(2), entregado_en:null, cancelado_en:null, nota:null,
-      items:[{producto_id:4, nombre:"Brownie", cantidad:3, precio_tokens:90, subtotal:270}] },
-    { id:3, socio_id:2, socio_nombre:"Carla Duarte", total_tokens:50, estado:"pendiente", created_at:_hace(0,3), entregado_en:null, cancelado_en:null, nota:"Paso a la tarde",
-      items:[{producto_id:5, nombre:"Papelillos", cantidad:2, precio_tokens:25, subtotal:50}] }
-  ],
-  movimientos_tokens: [
-    { id:1, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"carga_presencial", cantidad:1200, saldo_resultante:1200, referencia:"Carga en el local", referencia_id:null, detalle:null, hecho_por:"Sebastián", created_at:_hace(20) },
-    { id:2, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_pedido",   cantidad:-265, saldo_resultante:935,  referencia:"Pedido #0001", referencia_id:1, detalle:null, hecho_por:null, created_at:_hace(12) },
-    { id:3, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_local",    cantidad:-45,  saldo_resultante:890,  referencia:"Consumo en el local", referencia_id:null, detalle:"2 papelillos y filtros", hecho_por:"Lucía", created_at:_hace(4) },
-    { id:4, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"consumo_pedido",   cantidad:-270, saldo_resultante:620,  referencia:"Pedido #0002", referencia_id:2, detalle:null, hecho_por:null, created_at:_hace(2) },
-    { id:5, socio_id:1, socio_nombre:"Martín Álvarez", tipo:"ajuste_admin",     cantidad:230,  saldo_resultante:850,  referencia:"Ajuste del club", referencia_id:null, detalle:"corrección de carga del 12/03", hecho_por:"Sebastián", created_at:_hace(1) },
-    { id:6, socio_id:2, socio_nombre:"Carla Duarte",   tipo:"carga_presencial", cantidad:110,  saldo_resultante:110,  referencia:"Carga en el local", referencia_id:null, detalle:null, hecho_por:"Lucía", created_at:_hace(6) },
-    { id:7, socio_id:2, socio_nombre:"Carla Duarte",   tipo:"consumo_pedido",   cantidad:-50,  saldo_resultante:60,   referencia:"Pedido #0003", referencia_id:3, detalle:null, hecho_por:null, created_at:_hace(0,3) },
-    { id:8, socio_id:3, socio_nombre:"Diego Ferrer",   tipo:"carga_presencial", cantidad:200,  saldo_resultante:200,  referencia:"Carga en el local", referencia_id:null, detalle:null, hecho_por:"Sebastián", created_at:_hace(30) }
-  ],
-  codigos_canje: [
-    { id:1, codigo:"PRUEBA100", tokens:100, usado:false, usado_por:null, usado_en:null, vence_en:null, descripcion:"Código de prueba", created_at:_hace(10) },
-    { id:2, codigo:"BIENVENIDO", tokens:300, usado:true, usado_por:1, usado_en:_hace(15), vence_en:null, descripcion:"Bienvenida — ya usado", created_at:_hace(20) }
-  ],
-  imagenes: {},
-  auditoria: []
-};
-
-var _demoUsuario = null;
-
-function demoError(codigo){ throw new Error(traducirError(codigo)); }
-
-function _demoProxId(tabla){
-  return DEMO[tabla].reduce(function(a,r){ return Math.max(a, Number(r.id)||0); }, 0) + 1;
-}
-
-function _demoNombreSocio(s){ return (s.nombre + " " + (s.apellido || "")).trim(); }
-
-function _demoMover(socioId, tipo, cantidad, referencia, referenciaId, detalle, hechoPor){
-  var s = DEMO.socios.filter(function(x){ return String(x.id) === String(socioId); })[0];
-  if (!s) demoError("SOCIO_INEXISTENTE");
-  var nuevo = s.saldo_tokens + cantidad;
-  if (nuevo < 0) demoError("SALDO_INSUFICIENTE:" + s.saldo_tokens);
-  s.saldo_tokens = nuevo;
-  DEMO.movimientos_tokens.unshift({
-    id:_demoProxId("movimientos_tokens"), socio_id:s.id, socio_nombre:_demoNombreSocio(s),
-    tipo:tipo, cantidad:cantidad, saldo_resultante:nuevo, referencia:referencia,
-    referencia_id:referenciaId || null, detalle:detalle || null, hecho_por:hechoPor || null,
-    created_at:new Date().toISOString()
-  });
-  return nuevo;
-}
-
-function _demoAdmin(){ if (!_demoUsuario || _demoUsuario.rol !== "administrador") demoError("SIN_PERMISO"); }
-function _demoSesion(){ if (!_demoUsuario) demoError("SESION_INVALIDA"); }
-
-async function demoRPC(fn, p){
-  await new Promise(function(r){ setTimeout(r, 90); });
-
-  if (fn === "fn_panel_login") {
-    var u = DEMO.usuarios_panel.filter(function(x){ return x.usuario === String(p.p_usuario||"").trim().toLowerCase(); })[0];
-    if (!u || u.password !== p.p_password) demoError("CREDENCIALES");
-    if (!u.activo) demoError("SIN_ACCESO");
-    _demoUsuario = u;
-    return { token:"demo-token-" + u.id + "-0123456789012345678901234567890123456789", id:u.id, nombre:u.nombre, rol:u.rol };
-  }
-
-  if (fn === "fn_panel_logout") { _demoUsuario = null; return null; }
-
-  _demoSesion();
-  var admin = _demoUsuario.rol === "administrador";
-
-  if (fn === "fn_panel_datos") {
-    var base = {
-      yo: { id:_demoUsuario.id, nombre:_demoUsuario.nombre, rol:_demoUsuario.rol },
-      socios: JSON.parse(JSON.stringify(DEMO.socios)),
-      pedidos: JSON.parse(JSON.stringify(DEMO.pedidos)),
-      movimientos: JSON.parse(JSON.stringify(DEMO.movimientos_tokens)),
-      configuracion: [], productos: [], codigos: [], usuarios: []
-    };
-    if (admin) {
-      base.configuracion = JSON.parse(JSON.stringify(DEMO.configuracion));
-      base.productos = DEMO.productos.map(function(pr){
-        var c = JSON.parse(JSON.stringify(pr));
-        c.tiene_imagen = !!DEMO.imagenes[pr.id];
-        return c;
-      });
-      base.codigos = JSON.parse(JSON.stringify(DEMO.codigos_canje));
-      base.usuarios = DEMO.usuarios_panel.map(function(u2){
-        return { id:u2.id, nombre:u2.nombre, usuario:u2.usuario, rol:u2.rol, activo:u2.activo, created_at:u2.created_at };
-      });
-      base.total_circulacion = DEMO.socios.reduce(function(a,s){ return a + s.saldo_tokens; }, 0);
-    }
-    return base;
-  }
-
-  if (fn === "fn_panel_tokens") {
-    if (["carga_presencial","consumo_local","ajuste_admin"].indexOf(p.p_tipo) < 0) demoError("TIPO_INVALIDO");
-    if (p.p_tipo === "ajuste_admin") _demoAdmin();
-    var cant = parseInt(p.p_cantidad, 10);
-    var det = (p.p_detalle || "").trim();
-    if (p.p_tipo === "carga_presencial") {
-      if (!(cant > 0)) demoError("CANTIDAD_INVALIDA");
-      return { saldo:_demoMover(p.p_socio_id, p.p_tipo, cant, "Carga en el local", null, det || null, _demoUsuario.nombre) };
-    }
-    if (p.p_tipo === "consumo_local") {
-      if (!(cant > 0)) demoError("CANTIDAD_INVALIDA");
-      if (!det) demoError("FALTA_DETALLE");
-      return { saldo:_demoMover(p.p_socio_id, p.p_tipo, -cant, "Consumo en el local", null, det, _demoUsuario.nombre) };
-    }
-    if (!cant) demoError("CANTIDAD_INVALIDA");
-    if (!det) demoError("FALTA_MOTIVO");
-    return { saldo:_demoMover(p.p_socio_id, p.p_tipo, cant, "Ajuste del club", null, det, _demoUsuario.nombre) };
-  }
-
-  if (fn === "fn_panel_socio_guardar") {
-    var d = p.p_datos || {};
-    var id = d.id ? Number(d.id) : null;
-    var usuario = String(d.usuario || "").trim().toLowerCase();
-    if (!String(d.nombre || "").trim()) demoError("FALTA_NOMBRE");
-    if (!usuario) demoError("FALTA_USUARIO");
-    if (DEMO.socios.filter(function(s){ return s.usuario === usuario && (!id || s.id !== id); })[0]) demoError("USUARIO_REPETIDO");
-
-    if (!id) {
-      if (!d.password) demoError("FALTA_PASSWORD");
-      var nuevoS = {
-        id:_demoProxId("socios"), nombre:d.nombre.trim(), apellido:d.apellido || null, usuario:usuario,
-        email:d.email || null, telefono:d.telefono || null, dni:d.dni || null,
-        saldo_tokens:0, estado:"activo", notas:d.notas || null, created_at:new Date().toISOString()
-      };
-      DEMO.socios.push(nuevoS);
-      return { id:nuevoS.id };
-    }
-    var s2 = DEMO.socios.filter(function(x){ return x.id === id; })[0];
-    if (d.estado && d.estado !== s2.estado) { _demoAdmin(); s2.estado = d.estado; }
-    s2.nombre = d.nombre.trim(); s2.apellido = d.apellido || null; s2.usuario = usuario;
-    s2.email = d.email || null; s2.telefono = d.telefono || null; s2.dni = d.dni || null;
-    s2.notas = d.notas || null;
-    return { id:id };
-  }
-
-  if (fn === "fn_panel_socio_borrar") {
-    _demoAdmin();
-    DEMO.socios = DEMO.socios.filter(function(s){ return String(s.id) !== String(p.p_socio_id); });
-    DEMO.pedidos = DEMO.pedidos.filter(function(x){ return String(x.socio_id) !== String(p.p_socio_id); });
-    DEMO.movimientos_tokens = DEMO.movimientos_tokens.filter(function(m){ return String(m.socio_id) !== String(p.p_socio_id); });
-    return null;
-  }
-
-  if (fn === "fn_panel_pedido_estado") {
-    var ped = DEMO.pedidos.filter(function(x){ return String(x.id) === String(p.p_pedido_id); })[0];
-    if (!ped) demoError("PEDIDO_INEXISTENTE");
-    var ok = (ped.estado === "pendiente" && p.p_estado === "preparando") ||
-             (ped.estado === "preparando" && p.p_estado === "listo") ||
-             (ped.estado === "listo" && p.p_estado === "entregado");
-    if (!ok) demoError("TRANSICION_INVALIDA");
-    ped.estado = p.p_estado;
-    if (p.p_estado === "entregado") ped.entregado_en = new Date().toISOString();
-    return null;
-  }
-
-  if (fn === "fn_panel_pedido_cancelar") {
-    _demoAdmin();
-    var pc = DEMO.pedidos.filter(function(x){ return String(x.id) === String(p.p_pedido_id); })[0];
-    if (!pc) demoError("PEDIDO_INEXISTENTE");
-    if (["entregado","cancelado"].indexOf(pc.estado) >= 0) demoError("PEDIDO_CERRADO");
-    pc.estado = "cancelado"; pc.cancelado_en = new Date().toISOString();
-    _demoMover(pc.socio_id, "devolucion_pedido", pc.total_tokens,
-               "Pedido " + nroPedido(pc.id) + " cancelado", pc.id,
-               "Cancelado desde el panel de administración", _demoUsuario.nombre);
-    (pc.items || []).forEach(function(i){
-      var pr = DEMO.productos.filter(function(x){ return x.id === i.producto_id; })[0];
-      if (pr) pr.stock += i.cantidad;
-    });
-    return null;
-  }
-
-  if (fn === "fn_panel_producto_guardar") {
-    _demoAdmin();
-    var dp = p.p_datos || {};
-    if (!String(dp.nombre || "").trim()) demoError("FALTA_NOMBRE");
-    if (!String(dp.categoria || "").trim()) demoError("FALTA_CATEGORIA");
-    if (!(Number(dp.precio_tokens) >= 0)) demoError("PRECIO_INVALIDO");
-    if (!(Number(dp.stock) >= 0)) demoError("STOCK_INVALIDO");
-    if (!dp.id) {
-      var np = { id:_demoProxId("productos"), nombre:dp.nombre.trim(), descripcion:dp.descripcion || null,
-                 categoria:String(dp.categoria).toLowerCase().trim(), precio_tokens:Number(dp.precio_tokens),
-                 stock:Number(dp.stock), activo:dp.activo !== false, orden:Number(dp.orden) || 0, tiene_imagen:false };
-      DEMO.productos.push(np);
-      return { id:np.id };
-    }
-    var pr2 = DEMO.productos.filter(function(x){ return String(x.id) === String(dp.id); })[0];
-    pr2.nombre = dp.nombre.trim(); pr2.descripcion = dp.descripcion || null;
-    pr2.categoria = String(dp.categoria).toLowerCase().trim();
-    pr2.precio_tokens = Number(dp.precio_tokens); pr2.stock = Number(dp.stock);
-    pr2.activo = dp.activo !== false; pr2.orden = Number(dp.orden) || 0;
-    return { id:pr2.id };
-  }
-
-  if (fn === "fn_panel_producto_stock") {
-    _demoAdmin();
-    var ps = DEMO.productos.filter(function(x){ return String(x.id) === String(p.p_producto_id); })[0];
-    if (!ps || ps.stock + p.p_delta < 0) demoError("STOCK_INVALIDO");
-    ps.stock += p.p_delta;
-    return { stock:ps.stock };
-  }
-
-  if (fn === "fn_panel_producto_borrar") {
-    _demoAdmin();
-    DEMO.productos = DEMO.productos.filter(function(x){ return String(x.id) !== String(p.p_producto_id); });
-    delete DEMO.imagenes[p.p_producto_id];
-    return null;
-  }
-
-  if (fn === "fn_panel_imagen_guardar") {
-    _demoAdmin();
-    if (["image/jpeg","image/png","image/webp"].indexOf(p.p_mime) < 0) demoError("FORMATO_INVALIDO");
-    if ((p.p_datos || "").length > 900000) demoError("IMAGEN_GRANDE");
-    DEMO.imagenes[p.p_producto_id] = "data:" + p.p_mime + ";base64," + p.p_datos;
-    var pi = DEMO.productos.filter(function(x){ return String(x.id) === String(p.p_producto_id); })[0];
-    if (pi) pi.tiene_imagen = true;
-    return null;
-  }
-
-  if (fn === "fn_panel_imagen_borrar") {
-    _demoAdmin();
-    delete DEMO.imagenes[p.p_producto_id];
-    var pb = DEMO.productos.filter(function(x){ return String(x.id) === String(p.p_producto_id); })[0];
-    if (pb) pb.tiene_imagen = false;
-    return null;
-  }
-
-  if (fn === "fn_panel_imagenes") {
-    _demoAdmin();
-    var out = {};
-    (p.p_ids || []).forEach(function(id2){ if (DEMO.imagenes[id2]) out[id2] = DEMO.imagenes[id2]; });
-    return out;
-  }
-
-  if (fn === "fn_panel_codigos_generar") {
-    _demoAdmin();
-    if (!(p.p_tokens > 0)) demoError("TOKENS_INVALIDOS");
-    if (p.p_cuantos < 1 || p.p_cuantos > 50) demoError("CANTIDAD_INVALIDA");
-    if (p.p_manual && p.p_cuantos > 1) demoError("MANUAL_UNO");
-    var abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", lista = [];
-    for (var i = 0; i < p.p_cuantos; i++) {
-      var cod = p.p_manual ? String(p.p_manual).toUpperCase().trim() : "";
-      if (!cod) {
-        do {
-          cod = "";
-          for (var j = 0; j < 6; j++) cod += abc.charAt(Math.floor(Math.random() * abc.length));
-        } while (DEMO.codigos_canje.filter(function(c){ return c.codigo === cod; })[0]);
-      } else if (DEMO.codigos_canje.filter(function(c){ return c.codigo === cod; })[0]) {
-        demoError("CODIGO_EXISTE");
-      }
-      DEMO.codigos_canje.unshift({ id:_demoProxId("codigos_canje"), codigo:cod, tokens:p.p_tokens,
-        usado:false, usado_por:null, usado_en:null, vence_en:p.p_vence || null,
-        descripcion:p.p_descripcion || null, created_at:new Date().toISOString() });
-      lista.push(cod);
-    }
-    return { codigos:lista };
-  }
-
-  if (fn === "fn_panel_codigo_anular") {
-    _demoAdmin();
-    var c2 = DEMO.codigos_canje.filter(function(x){ return String(x.id) === String(p.p_codigo_id); })[0];
-    if (!c2 || c2.usado) demoError("CODIGO_USADO");
-    DEMO.codigos_canje = DEMO.codigos_canje.filter(function(x){ return String(x.id) !== String(p.p_codigo_id); });
-    return null;
-  }
-
-  if (fn === "fn_panel_usuario_guardar") {
-    _demoAdmin();
-    var du = p.p_datos || {};
-    var uid = du.id ? Number(du.id) : null;
-    var uu = String(du.usuario || "").trim().toLowerCase();
-    var rol = du.rol || "empleado";
-    var activo = du.activo !== false;
-    if (!String(du.nombre || "").trim()) demoError("FALTA_NOMBRE");
-    if (!uu) demoError("FALTA_USUARIO");
-    if (DEMO.usuarios_panel.filter(function(x){ return x.usuario === uu && (!uid || x.id !== uid); })[0]) demoError("USUARIO_REPETIDO");
-    if (uid && uid === _demoUsuario.id && (rol !== "administrador" || !activo)) demoError("UNO_MISMO");
-    if (uid && (rol !== "administrador" || !activo)) {
-      if (!DEMO.usuarios_panel.filter(function(x){ return x.rol === "administrador" && x.activo && x.id !== uid; })[0]) demoError("ULTIMO_ADMIN");
-    }
-    if (!uid) {
-      if (!du.password) demoError("FALTA_PASSWORD");
-      var nu = { id:_demoProxId("usuarios_panel"), nombre:du.nombre.trim(), usuario:uu,
-                 password:du.password, rol:rol, activo:activo, created_at:new Date().toISOString() };
-      DEMO.usuarios_panel.push(nu);
-      return { id:nu.id };
-    }
-    var u3 = DEMO.usuarios_panel.filter(function(x){ return x.id === uid; })[0];
-    u3.nombre = du.nombre.trim(); u3.usuario = uu; u3.rol = rol; u3.activo = activo;
-    if (du.password) u3.password = du.password;
-    return { id:uid };
-  }
-
-  if (fn === "fn_panel_config") {
-    _demoAdmin();
-    if (!String(p.p_clave || "").trim()) demoError("FALTA_CLAVE");
-    var cf = DEMO.configuracion.filter(function(x){ return x.clave === p.p_clave.trim(); })[0];
-    if (cf) { cf.valor = p.p_valor; if (p.p_descripcion) cf.descripcion = p.p_descripcion; }
-    else DEMO.configuracion.push({ id:_demoProxId("configuracion"), clave:p.p_clave.trim(), valor:p.p_valor, descripcion:p.p_descripcion || null });
-    return null;
-  }
-
-  if (fn === "fn_panel_password") {
-    if (_demoUsuario.password !== p.p_actual) demoError("CREDENCIALES");
-    if (String(p.p_nueva || "").length < 8) demoError("PASSWORD_CORTA");
-    _demoUsuario.password = p.p_nueva;
-    return null;
-  }
-
-  if (fn === "fn_panel_reporte") {
-    _demoAdmin();
-    var d1 = new Date(p.p_desde), d2 = new Date(p.p_hasta);
-    var enR = function(iso){ var f = new Date(iso); return f >= d1 && f <= d2; };
-    var peds = DEMO.pedidos.filter(function(x){ return enR(x.created_at); });
-    var validos = peds.filter(function(x){ return x.estado !== "cancelado"; });
-    var movs = DEMO.movimientos_tokens.filter(function(m){ return enR(m.created_at); });
-    var rank = {};
-    validos.forEach(function(x){
-      (x.items || []).forEach(function(i){
-        if (!rank[i.nombre]) rank[i.nombre] = { nombre:i.nombre, unidades:0, tokens:0 };
-        rank[i.nombre].unidades += i.cantidad;
-        rank[i.nombre].tokens += i.subtotal;
-      });
-    });
-    var quienes = {};
-    validos.forEach(function(x){ quienes[x.socio_id] = true; });
-    return {
-      pedidos_total: peds.length,
-      pedidos_entregados: peds.filter(function(x){ return x.estado === "entregado"; }).length,
-      socios_pidieron: Object.keys(quienes).length,
-      tokens_cargados: movs.filter(function(m){ return m.cantidad > 0; }).reduce(function(a,m){ return a + m.cantidad; }, 0),
-      consumo_pedidos: movs.filter(function(m){ return m.tipo === "consumo_pedido"; }).reduce(function(a,m){ return a + Math.abs(m.cantidad); }, 0),
-      consumo_local: movs.filter(function(m){ return m.tipo === "consumo_local"; }).reduce(function(a,m){ return a + Math.abs(m.cantidad); }, 0),
-      circulacion: DEMO.socios.reduce(function(a,s){ return a + s.saldo_tokens; }, 0),
-      ranking: Object.keys(rank).map(function(k){ return rank[k]; }).sort(function(a,b){ return b.unidades - a.unidades; }).slice(0, 15)
-    };
-  }
-
-  return null;
-}
-
-
-/* ==========================================================================
    ESTADO DEL PANEL
    ========================================================================== */
 var USUARIO = null;
@@ -1817,12 +1784,23 @@ var cacheImagenes = {};      // fotos ya traídas, para no pedirlas dos veces
 var trabajando = false;
 
 var SIGUIENTE = { pendiente:"preparando", preparando:"listo", listo:"entregado" };
-var CLASE_ESTADO = { pendiente:"neutro", preparando:"info", listo:"avi", entregado:"ok", cancelado:"no" };
+var CLASE_ESTADO = { esperando_pago:"oro", pendiente:"neutro", preparando:"info", listo:"avi", entregado:"ok", cancelado:"no" };
 var TITULOS = { inicio:"nav_inicio", pedidos:"nav_pedidos", socios:"nav_socios",
                 tokens:"nav_tokens", catalogo:"nav_catalogo", reportes:"nav_conta",
-                usuarios:"nav_usuarios", config:"nav_config", cuenta:"nav_cuenta" };
+                usuarios:"nav_usuarios", config:"nav_config", cuenta:"nav_cuenta",
+                pagos:"nav_pagos", venta:"nav_venta", stock:"nav_stock" };
 
-var SOLO_ADMIN = ["inicio","catalogo","reportes","usuarios","config"];
+/* El empleado se ocupa de los envíos, la venta en el local y la recepción
+   de stock. Socios, tokens y pagos son del administrador. */
+var SOLO_ADMIN = ["inicio","catalogo","reportes","usuarios","config","socios","tokens","pagos"];
+
+/* Lo nuevo llega en una llamada aparte (fn_panel_extra). */
+var extra = { pagos:[], recepciones:[], membresias:[], matriculas:{}, productos_venta:[],
+              compra:{ min_g:0, max_g:0, matricula_tokens:0 } };
+var tabPagos = "pendientes";
+var ventaSocio = null, ventaItems = [];
+var recibiendo = null, recepcionAbierta = null, editandoMemb = null;
+var CLAVES_COMPRA = ["compra_minima_g","compra_maxima_g","matricula_tokens","datos_transferencia","comprobantes_dias"];
 
 function esAdmin(){ return !!USUARIO && USUARIO.rol === "administrador"; }
 
@@ -1966,7 +1944,7 @@ async function abrirPanel(){
 
   aplicarPermisos();
   await cargarTodo();
-  ir(esAdmin() ? "inicio" : "tokens");
+  ir(esAdmin() ? "inicio" : "pedidos");
 }
 
 /* ==========================================================================
@@ -1992,7 +1970,17 @@ function puedeVer(destino){
    Una sola llamada trae todo lo que el rol tiene permitido ver.
    ========================================================================== */
 async function cargarTodo(){
-  var d = await rpc("fn_panel_datos", { p_token:TOKEN });
+  var r = await Promise.all([
+    rpc("fn_panel_datos", { p_token:TOKEN }),
+    rpc("fn_panel_extra", { p_token:TOKEN })
+  ]);
+  var d = r[0];
+  var x = r[1] || {};
+  extra = {
+    pagos: x.pagos || [], recepciones: x.recepciones || [], membresias: x.membresias || [],
+    matriculas: x.matriculas || {}, productos_venta: x.productos_venta || [],
+    compra: x.compra || { min_g:0, max_g:0, matricula_tokens:0 }
+  };
 
   USUARIO = d.yo;
   socios      = d.socios || [];
@@ -2022,6 +2010,14 @@ function pintarPill(){
   var pill = $("pill-pedidos");
   pill.textContent = abiertos;
   pill.style.display = abiertos > 0 ? "inline-block" : "none";
+
+  var np = pagosPendientes().length;
+  $("pill-pagos").textContent = np;
+  $("pill-pagos").style.display = np > 0 && esAdmin() ? "inline-block" : "none";
+
+  var ns = extra.recepciones.filter(function(r){ return r.estado === "pendiente"; }).length;
+  $("pill-stock").textContent = ns;
+  $("pill-stock").style.display = ns > 0 ? "inline-block" : "none";
 }
 
 /* Envoltorio para las operaciones: evita el doble click, muestra el error
@@ -2046,7 +2042,7 @@ async function operar(fn, params, alTerminar){
    NAVEGACIÓN
    ========================================================================== */
 function ir(destino){
-  if (!puedeVer(destino)) destino = "tokens";
+  if (!puedeVer(destino)) destino = "pedidos";
   seccion = destino;
 
   var secs = document.querySelectorAll(".seccion");
@@ -2066,11 +2062,14 @@ function pintarSeccion(destino){
   if (destino === "inicio")   pintarInicio();
   if (destino === "pedidos")  pintarPedidos();
   if (destino === "socios")   pintarSocios();
-  if (destino === "tokens")   { llenarSelectSocios(); if (esAdmin()) pintarCodigos(); pintarMovimientos(); }
+  if (destino === "tokens")   { llenarSelectSocios(); pintarCodigos(); pintarMovimientos(); }
   if (destino === "catalogo") { llenarSelectCategorias(); pintarProductos(); }
   if (destino === "reportes") pintarReportes();
   if (destino === "usuarios") pintarUsuarios();
   if (destino === "config")   pintarConfig();
+  if (destino === "pagos")    pintarPagos();
+  if (destino === "venta")    pintarVenta();
+  if (destino === "stock")    pintarStock();
 }
 
 function abrirLateral(){ $("lateral").classList.add("open"); $("tapa").classList.add("open"); }
@@ -2081,6 +2080,11 @@ function cerrarLateral(){ $("lateral").classList.remove("open"); $("tapa").class
    PANEL GENERAL
    ========================================================================== */
 function pintarInicio(){
+  var np = pagosPendientes().length;
+  $("inicio-avisos").innerHTML = np > 0
+    ? '<div class="aviso a-avi"><span>' + t("rv_por_revisar", np) + '</span>' +
+      '<button class="btn btn-sm" onclick="ir(\'pagos\')">' + t("rv_ir") + '</button></div>'
+    : "";
   var abiertos = pedidos.filter(function(p){ return ["pendiente","preparando","listo"].indexOf(p.estado) >= 0; });
   var pend = abiertos.filter(function(p){ return p.estado === "pendiente"; }).length;
   var activos = socios.filter(function(s){ return s.estado === "activo"; });
@@ -2131,7 +2135,7 @@ function pedidosFiltrados(){
   var h = $("f-ped-hasta").value ? new Date($("f-ped-hasta").value + "T23:59:59") : null;
 
   return pedidos.filter(function(p){
-    if (est === "abiertos") { if (["pendiente","preparando","listo"].indexOf(p.estado) < 0) return false; }
+    if (est === "abiertos") { if (["esperando_pago","pendiente","preparando","listo"].indexOf(p.estado) < 0) return false; }
     else if (est && p.estado !== est) return false;
 
     var f = new Date(p.created_at);
@@ -2160,21 +2164,25 @@ function pintarPedidos(){
       '<td class="mono">' + nroPedido(p.id) + '</td>' +
       '<td>' + esc(p.socio_nombre) + '</td>' +
       '<td>' + esc(resumenItems(p)) + '</td>' +
-      '<td class="num">' + num(p.total_tokens) + '</td>' +
+      (esAdmin() ? '<td class="num">' + num(p.total_tokens) + '</td>' : "") +
       '<td>' + badge(p.estado) + '</td>' +
       '<td>' + fecha(p.created_at) + '</td>' +
       '<td class="acc"><button class="btn btn-sec btn-sm" data-pedido="' + p.id + '">' + t("abrir") + '</button></td>' +
       '</tr>';
-  }).join("") : '<tr><td colspan="7" class="vacio">' + t("sin_resultados") + '</td></tr>';
+  }).join("") : '<tr><td colspan="' + (esAdmin() ? 7 : 6) + '" class="vacio">' + t("sin_resultados") + '</td></tr>';
 }
 
 function abrirPedido(id){
   var p = pedidos.filter(function(x){ return String(x.id) === String(id); })[0];
   if (!p) return;
 
+  /* Al empleado la base no le manda los importes: arma la comanda con el
+     producto y la cantidad, que es lo que necesita para prepararlo. */
+  var conPlata = esAdmin();
   var items = (p.items || []).map(function(i){
     return '<tr><td>' + esc(i.nombre) + '</td><td class="num">' + i.cantidad + '</td>' +
-           '<td class="num">' + num(i.precio_tokens) + '</td><td class="num">' + num(i.subtotal) + '</td></tr>';
+           (conPlata ? '<td class="num">' + num(i.precio_tokens) + '</td>' +
+                       '<td class="num">' + num(i.subtotal) + '</td>' : "") + '</tr>';
   }).join("");
 
   $("mp-titulo").textContent = t("pedido_ref", nroPedido(p.id));
@@ -2185,22 +2193,30 @@ function abrirPedido(id){
     (p.entregado_en ? '<div class="dato"><span class="r">' + t("p_entregado_en") + '</span><span class="v">' + fecha(p.entregado_en) + '</span></div>' : "") +
     (p.cancelado_en ? '<div class="dato"><span class="r">' + t("p_cancelado_en") + '</span><span class="v">' + fecha(p.cancelado_en) + '</span></div>' : "") +
     (p.nota ? '<div class="dato"><span class="r">' + t("p_nota_socio") + '</span><span class="v">' + esc(p.nota) + '</span></div>' : "") +
-    '<div class="tabla-wrap" style="margin-top:18px"><table><thead><tr><th>' + t("th_producto") + '</th><th class="num">' + t("p_cantidad") +
-    '</th><th class="num">' + t("th_precio") + '</th><th class="num">' + t("p_subtotal") + '</th></tr></thead><tbody>' + items +
-    '<tr><td colspan="3" style="text-align:right;font-weight:600">' + t("p_total") + '</td>' +
-    '<td class="num"><span class="tok">' + icoToken() + num(p.total_tokens) + '</span></td></tr></tbody></table></div>';
+    datoPagoPedido(p) +
+    '<div class="tabla-wrap" style="margin-top:18px"><table><thead><tr><th>' + t("th_producto") + '</th><th class="num">' + t("p_cantidad") + '</th>' +
+    (conPlata ? '<th class="num">' + t("th_precio") + '</th><th class="num">' + t("p_subtotal") + '</th>' : "") +
+    '</tr></thead><tbody>' + items +
+    (conPlata ? '<tr><td colspan="3" style="text-align:right;font-weight:600">' + t("p_total") + '</td>' +
+                '<td class="num"><span class="tok">' + icoToken() + num(p.total_tokens) + '</span></td></tr>' : "") +
+    '</tbody></table></div>';
 
   var pie = [];
+  var pagoP = pagoDePedido(p.id);
+  if (esAdmin() && p.estado === "esperando_pago" && pagoP) {
+    pie.push('<button class="btn" id="mp-ver-pago">' + t("p_ver_pago") + '</button>');
+  }
   if (SIGUIENTE[p.estado]) {
     pie.push('<button class="btn" id="mp-avanzar">' + t("p_avanzar", t("e_" + SIGUIENTE[p.estado]).toLowerCase()) + '</button>');
   }
-  if (esAdmin() && p.estado !== "entregado" && p.estado !== "cancelado") {
+  if (esAdmin() && ["entregado","cancelado","esperando_pago"].indexOf(p.estado) < 0) {
     pie.push('<button class="btn btn-peligro" id="mp-cancelar">' + t("p_cancelar") + '</button>');
   }
   if (!pie.length) pie.push('<button class="btn btn-linea" data-cerrar="modal-pedido">' + t("cerrar") + '</button>');
   $("mp-pie").innerHTML = pie.join("");
 
   if ($("mp-avanzar")) $("mp-avanzar").onclick = function(){ avanzarPedido(p); };
+  if ($("mp-ver-pago")) $("mp-ver-pago").onclick = function(){ cerrarModal("modal-pedido"); abrirRevisar(pagoP.id); };
   if ($("mp-cancelar")) $("mp-cancelar").onclick = function(){
     confirmar(t("p_cancelar_titulo", nroPedido(p.id)),
       t("p_cancelar_texto", num(p.total_tokens), p.socio_nombre),
@@ -2253,10 +2269,11 @@ function pintarSocios(){
       '<td class="mono">' + esc(s.usuario) + '</td>' +
       '<td>' + esc(s.telefono || s.email || "—") + '</td>' +
       '<td class="num"><span class="tok">' + icoToken() + num(s.saldo_tokens) + '</span></td>' +
-      '<td>' + badgeSocio(s.estado) + '</td>' +
+      '<td>' + badgeSocio(s.estado) +
+        (matriculaExigida() && extra.matriculas[s.id] === false ? ' <span class="badge b-oro">' + t("mat_sin") + '</span>' : '') + '</td>' +
       '<td class="acc">' +
         '<button class="btn btn-sec btn-sm" data-ficha="' + s.id + '">' + t("ficha") + '</button> ' +
-        '<button class="btn btn-linea btn-sm" data-editar-socio="' + s.id + '">' + t("editar") + '</button>' +
+        (esAdmin() ? '<button class="btn btn-linea btn-sm" data-editar-socio="' + s.id + '">' + t("editar") + '</button>' : "") +
       '</td></tr>';
   }).join("") : '<tr><td colspan="6" class="vacio">' + t("sin_resultados") + '</td></tr>';
 }
@@ -2308,16 +2325,28 @@ function abrirFicha(id){
     '<div class="dato"><span class="r">' + t("f_telefono") + '</span><span class="v">' + esc(s.telefono || "—") + '</span></div>' +
     '<div class="dato"><span class="r">' + t("f_dni") + '</span><span class="v">' + esc(s.dni || "—") + '</span></div>' +
     '<div class="dato"><span class="r">' + t("socio_desde") + '</span><span class="v">' + fechaCorta(s.created_at) + '</span></div>' +
+    (esAdmin() ? '<div class="dato"><span class="r">' + t("mat_titulo") + '</span><span class="v">' +
+      (extra.matriculas[s.id] ? '<span class="badge b-ok">' + t("mat_paga") + '</span>' : '<span class="badge b-oro">' + t("mat_pendiente") + '</span>') +
+      ' <button class="btn btn-linea btn-sm" id="mf-matricula" style="margin-left:6px">' +
+        (extra.matriculas[s.id] ? t("mat_desmarcar") : t("mat_marcar")) + '</button></span></div>' : "") +
     (s.notas ? '<div class="dato"><span class="r">' + t("f_notas") + '</span><span class="v">' + esc(s.notas) + '</span></div>' : "") +
     acciones +
-    '<div class="sub-titulo">' + t("historial_pedidos") + '</div>' +
-    '<div class="tabla-wrap"><table><thead><tr><th>' + t("th_pedido") + '</th><th>' + t("th_items") + '</th><th class="num">' + t("th_tokens") +
-    '</th><th>' + t("th_estado") + '</th><th>' + t("th_fecha") + '</th></tr></thead><tbody>' + filasPed + '</tbody></table></div>' +
-    '<div class="sub-titulo">' + t("historial_movs") + '</div>' +
-    '<div class="tabla-wrap"><table><thead><tr><th>' + t("th_fecha") + '</th><th>' + t("th_tipo") + '</th><th class="num">' + t("th_cantidad") +
-    '</th><th class="num">' + t("th_saldo") + '</th><th>' + t("th_hecho_por") + '</th><th>' + t("th_detalle") + '</th></tr></thead><tbody>' + filasMov + '</tbody></table></div>';
+    (esAdmin() ? '<div class="sub-titulo">' + t("historial_pedidos") + '</div>' : "") +
+    (esAdmin() ?
+      '<div class="tabla-wrap"><table><thead><tr><th>' + t("th_pedido") + '</th><th>' + t("th_items") + '</th><th class="num">' + t("th_tokens") +
+      '</th><th>' + t("th_estado") + '</th><th>' + t("th_fecha") + '</th></tr></thead><tbody>' + filasPed + '</tbody></table></div>' +
+      '<div class="sub-titulo">' + t("historial_movs") + '</div>' +
+      '<div class="tabla-wrap"><table><thead><tr><th>' + t("th_fecha") + '</th><th>' + t("th_tipo") + '</th><th class="num">' + t("th_cantidad") +
+      '</th><th class="num">' + t("th_saldo") + '</th><th>' + t("th_hecho_por") + '</th><th>' + t("th_detalle") + '</th></tr></thead><tbody>' + filasMov + '</tbody></table></div>'
+      : '<div class="aviso a-info" style="margin-top:20px">' + t("ficha_solo_saldo") + '</div>') + '';
 
   if ($("mf-ajuste")) $("mf-ajuste").onclick = function(){ abrirAjuste(s); };
+  if ($("mf-matricula")) $("mf-matricula").onclick = function(){
+    var paga = !extra.matriculas[s.id];
+    operar("fn_panel_matricula_marcar", { p_token:TOKEN, p_socio_id:s.id, p_paga:paga }, async function(){
+      await cargarTodo(); abrirFicha(s.id); pintarSocios(); toast(t("mat_ok"));
+    });
+  };
   if ($("mf-baja")) $("mf-baja").onclick = function(){
     confirmar(t("baja_titulo", nombreSocio(s)), t("baja_texto"),
       function(){ cambiarEstadoSocio(s, "inactivo"); }, t("dar_baja"));
@@ -2530,7 +2559,6 @@ async function moverTokens(signo){
    TOKENS — códigos de canje (solo administrador)
    ========================================================================== */
 function pintarCodigos(){
-  if (!esAdmin()) return;
   var f = $("f-cod-estado").value;
   var lista = codigos.filter(function(c){
     if (f === "true") return c.usado === true;
@@ -2550,15 +2578,18 @@ function pintarCodigos(){
       '<td>' + (c.usado ? esc(quien ? nombreSocio(quien) : t("cod_socio_borrado")) + '<span class="sub">' + fecha(c.usado_en) + '</span>' : "—") + '</td>' +
       '<td>' + (c.vence_en ? fechaCorta(c.vence_en) : "—") + '</td>' +
       '<td>' + esc(c.descripcion || "—") + '</td>' +
-      '<td class="acc">' + (c.usado ? "" : '<button class="btn btn-linea btn-sm" data-borrar-codigo="' + c.id + '">' + t("anular") + '</button>') + '</td>' +
+      '<td class="acc">' + ((c.usado || !esAdmin()) ? "" : '<button class="btn btn-linea btn-sm" data-borrar-codigo="' + c.id + '">' + t("anular") + '</button>') + '</td>' +
       '</tr>';
   }).join("") : '<tr><td colspan="7" class="vacio">' + t("sin_codigos") + '</td></tr>';
 }
 
 function abrirNuevoCodigo(){
-  if (!esAdmin()) return;
   ["cd-tokens","cd-manual","cd-vence","cd-desc"].forEach(function(id){ $(id).value = ""; });
   $("cd-cantidad").value = "1";
+  /* El empleado genera hasta 5 por tanda; el administrador, hasta 50.
+     El tope real lo aplica la base: esto es solo para que el campo no
+     permita escribir un número que después va a ser rechazado. */
+  $("cd-cantidad").max = esAdmin() ? 50 : 5;
   $("cd-resultado").innerHTML = "";
   $("mcod-error").style.display = "none";
   abrirModal("modal-codigo");
@@ -2626,6 +2657,7 @@ function movsFiltrados(){
 }
 
 function pintarMovimientos(){
+  if (!esAdmin()) return;   /* al empleado la base ni siquiera se los manda */
   var lista = movsFiltrados();
 
   if (esAdmin()) {
@@ -2701,7 +2733,8 @@ function pintarProductos(){
       : '<span class="mini-vacia"></span>';
     return '<tr>' +
       '<td>' + mini + '</td>' +
-      '<td><strong>' + esc(p.nombre) + '</strong>' + (p.descripcion ? '<span class="sub">' + esc(p.descripcion.slice(0,58)) + '</span>' : "") + '</td>' +
+      '<td><strong>' + esc(p.nombre) + '</strong>' + (p.descripcion ? '<span class="sub">' + esc(p.descripcion.slice(0,58)) + '</span>' : "") +
+        (Number(p.gramos) > 0 ? '<span class="sub">' + t("gramos_u", numG(p.gramos)) + '</span>' : "") + '</td>' +
       '<td>' + esc(etiquetaCat(p.categoria)) + '</td>' +
       '<td class="num"><span class="tok">' + icoToken() + num(p.precio_tokens) + '</span></td>' +
       '<td class="num" style="white-space:nowrap">' +
@@ -2781,7 +2814,7 @@ function nuevoProducto(){
   $("mpr-titulo").textContent = t("nuevo_producto");
   $("mpr-error").style.display = "none";
   $("p-nombre").value = ""; $("p-desc").value = "";
-  $("p-precio").value = ""; $("p-stock").value = "0"; $("p-orden").value = "0";
+  $("p-precio").value = ""; $("p-stock").value = "0"; $("p-orden").value = "0"; $("p-gramos").value = "0";
   $("p-activo").value = "true";
   $("p-cat").innerHTML = catSelectHTML(null);
   $("p-cat-nueva").value = "";
@@ -2802,6 +2835,7 @@ async function editarProducto(id){
   $("p-desc").value = p.descripcion || "";
   $("p-precio").value = p.precio_tokens;
   $("p-stock").value = p.stock;
+  $("p-gramos").value = Number(p.gramos || 0);
   $("p-orden").value = p.orden || 0;
   $("p-activo").value = p.activo ? "true" : "false";
   $("p-cat").innerHTML = catSelectHTML(p.categoria);
@@ -2899,6 +2933,9 @@ async function guardarProducto(){
   if (!datos.nombre) { fallar(t("err_falta_producto")); return; }
   if (!datos.categoria) { fallar(t("err_falta_coleccion")); return; }
   if (isNaN(datos.precio_tokens) || datos.precio_tokens < 0) { fallar(t("err_precio")); return; }
+  var gramos = parseFloat(String($("p-gramos").value || "0").replace(",", "."));
+  if (isNaN(gramos) || gramos < 0) { fallar(t("err_numero")); return; }
+  var gramosAntes = editandoProd ? Number(editandoProd.gramos || 0) : 0;
 
   var btn = $("mpr-guardar");
   btn.disabled = true;
@@ -2906,6 +2943,11 @@ async function guardarProducto(){
 
   await operar("fn_panel_producto_guardar", { p_token:TOKEN, p_datos:datos }, async function(r){
     var id = r.id;
+
+    if (gramos !== gramosAntes) {
+      try { await rpc("fn_panel_producto_gramos", { p_token:TOKEN, p_producto_id:id, p_gramos:gramos }); }
+      catch(e) { toast(e.message || t("err_servidor")); }
+    }
 
     /* La foto se sube después, ya con el id del producto */
     if (fotoPendiente) {
@@ -3183,7 +3225,8 @@ function cambiarAccesoUsuario(id){
    ========================================================================== */
 function pintarConfig(){
   if (!esAdmin()) return;
-  var claves = Object.keys(config);
+  pintarConfigCompras();
+  var claves = Object.keys(config).filter(function(k){ return CLAVES_COMPRA.indexOf(k) < 0; });
   $("lista-config").innerHTML = claves.map(function(k){
     var c = config[k];
     return '<div class="campo">' +
@@ -3278,7 +3321,7 @@ $("ac-codigo").onclick = function(){ ir("tokens"); tab("codigos"); abrirNuevoCod
 $("ac-pendientes").onclick = function(){ ir("pedidos"); $("f-ped-estado").value = "abiertos"; pintarPedidos(); };
 
 function tab(cual){
-  if (cual === "codigos" && !esAdmin()) cual = "carga";
+  if (cual === "movs" && !esAdmin()) cual = "carga";
   var btns = document.querySelectorAll("#tabs-tokens button");
   for (var i = 0; i < btns.length; i++) btns[i].classList.toggle("activo", btns[i].getAttribute("data-tab") === cual);
   ["carga","descuento","codigos","movs"].forEach(function(x){ $("tab-" + x).classList.toggle("activo", x === cual); });
@@ -3375,16 +3418,514 @@ document.addEventListener("click", function(e){
 
 
 /* ==========================================================================
+   COMPRAS: utilidades
+   ========================================================================== */
+function numG(n){ return Number(n || 0).toLocaleString("es-AR", { maximumFractionDigits:2 }); }
+function matriculaExigida(){ return Number(extra.compra.matricula_tokens || 0) > 0; }
+function pagosPendientes(){ return extra.pagos.filter(function(x){ return x.estado === "pendiente"; }); }
+function pagoDePedido(id){
+  return extra.pagos.filter(function(x){ return x.concepto === "pedido" && String(x.pedido_id) === String(id); })[0] || null;
+}
+function badgePago(x){
+  var clase = { pendiente:"oro", aprobado:"ok", rechazado:"no", cancelado:"neutro" };
+  var txt = (x.estado === "rechazado" && x.origen === "local") ? t("pe_faltante") : t("pe_" + x.estado);
+  return '<span class="badge b-' + (clase[x.estado] || "neutro") + '">' + esc(txt) + '</span>';
+}
+function conceptoPago(x){
+  if (x.concepto === "pedido") return x.origen === "local" ? t("pc_venta", nroPedido(x.pedido_id)) : t("pc_pedido", nroPedido(x.pedido_id));
+  if (x.concepto === "matricula") return t("pc_matricula");
+  return x.membresia_nombre || t("memb_titulo");
+}
+
+/* En la ficha del pedido: cómo se pagó. */
+function datoPagoPedido(p){
+  var pg = pagoDePedido(p.id);
+  if (p.origen === "local") {
+    return '<div class="dato"><span class="r">' + t("p_pago") + '</span><span class="v">' +
+           t("p_venta_local", esc(p.cargado_por || "—")) + (pg && esAdmin() ? ' ' + badgePago(pg) : '') + '</span></div>';
+  }
+  if (!esAdmin()) return "";
+  var metodo = p.metodo_pago || "saldo";
+  return '<div class="dato"><span class="r">' + t("p_pago") + '</span><span class="v">' + t("pm_" + metodo) +
+         (pg ? ' ' + badgePago(pg) : '') + '</span></div>';
+}
+
+
+/* ==========================================================================
+   PAGOS (solo administrador)
+   ========================================================================== */
+function pagosFiltrados(){
+  var con = $("f-pag-concepto").value, met = $("f-pag-metodo").value;
+  var q = $("f-pag-buscar").value.trim().toLowerCase();
+  return extra.pagos.filter(function(x){
+    if (tabPagos === "pendientes" ? x.estado !== "pendiente" : x.estado === "pendiente") return false;
+    if (con && x.concepto !== con) return false;
+    if (met && x.metodo !== met) return false;
+    if (q && ((x.socio_nombre || "") + " " + (x.operacion || "")).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+
+function pintarPagos(){
+  if (!esAdmin()) return;
+  var np = pagosPendientes().length;
+  $("n-pagos-pend").textContent = np ? "(" + np + ")" : "";
+  var btns = document.querySelectorAll("#tabs-pagos button");
+  for (var i = 0; i < btns.length; i++) btns[i].classList.toggle("activo", btns[i].getAttribute("data-tabpago") === tabPagos);
+
+  var lista = pagosFiltrados();
+  $("tb-pagos").innerHTML = lista.length ? lista.map(function(x){
+    return '<tr>' +
+      '<td>' + fecha(x.created_at) + '</td>' +
+      '<td>' + esc(x.socio_nombre) + '</td>' +
+      '<td>' + esc(conceptoPago(x)) + '</td>' +
+      '<td>' + esc(t("pm_" + x.metodo)) + '</td>' +
+      '<td class="mono">' + esc(x.operacion || "—") + '</td>' +
+      '<td class="num"><span class="tok">' + icoToken() + num(x.tokens) + '</span></td>' +
+      '<td>' + badgePago(x) + '</td>' +
+      '<td class="acc"><button class="btn ' + (x.estado === "pendiente" ? "" : "btn-linea ") + 'btn-sm" data-revisar="' + x.id + '">' +
+        (x.estado === "pendiente" ? t("revisar") : t("ver")) + '</button></td></tr>';
+  }).join("") : '<tr><td colspan="8" class="vacio">' + (tabPagos === "pendientes" ? t("sin_pagos_pend") : t("sin_resultados")) + '</td></tr>';
+}
+
+var urlComprobante = null;
+
+async function abrirRevisar(id){
+  var x = extra.pagos.filter(function(p){ return String(p.id) === String(id); })[0];
+  if (!x) return;
+  if (urlComprobante) { URL.revokeObjectURL(urlComprobante); urlComprobante = null; }
+
+  var ped = x.pedido_id ? pedidos.filter(function(p){ return String(p.id) === String(x.pedido_id); })[0] : null;
+  var items = ped ? (ped.items || []).map(function(i){
+    return '<tr><td>' + esc(i.nombre) + '</td><td class="num">' + i.cantidad + '</td><td class="num">' + num(i.subtotal) + '</td></tr>';
+  }).join("") : "";
+
+  $("mr-titulo").textContent = t("rv_titulo", x.socio_nombre || "—");
+  $("mr-cuerpo").innerHTML =
+    '<div class="dato"><span class="r">' + t("pag_concepto") + '</span><span class="v">' + esc(conceptoPago(x)) + '</span></div>' +
+    '<div class="dato"><span class="r">' + t("th_tokens") + '</span><span class="v"><span class="tok">' + icoToken() + num(x.tokens) + '</span></span></div>' +
+    '<div class="dato"><span class="r">' + t("pag_metodo") + '</span><span class="v">' + esc(t("pm_" + x.metodo)) + '</span></div>' +
+    (x.operacion ? '<div class="dato"><span class="r">' + t("pag_operacion") + '</span><span class="v mono">' + esc(x.operacion) + '</span></div>' : "") +
+    '<div class="dato"><span class="r">' + t("th_fecha") + '</span><span class="v">' + fecha(x.created_at) + '</span></div>' +
+    '<div class="dato"><span class="r">' + t("th_estado") + '</span><span class="v">' + badgePago(x) + '</span></div>' +
+    (x.revisado_por ? '<div class="dato"><span class="r"></span><span class="v">' + t("rv_revisado", esc(x.revisado_por), fecha(x.revisado_en)) + '</span></div>' : "") +
+    (x.motivo ? '<div class="dato"><span class="r">' + t("f_motivo") + '</span><span class="v">' + esc(x.motivo) + '</span></div>' : "") +
+    (items ? '<div class="sub-titulo">' + t("rv_items") + '</div><div class="tabla-wrap"><table><thead><tr><th>' + t("th_producto") +
+             '</th><th class="num">' + t("p_cantidad") + '</th><th class="num">' + t("p_subtotal") + '</th></tr></thead><tbody>' + items + '</tbody></table></div>' : "") +
+    (x.metodo === "transferencia"
+      ? '<div class="sub-titulo">' + t("rv_comprobante") + '</div><div class="comprobante" id="mr-comp">' + t("rv_cargando") + '</div>'
+      : '<div class="aviso a-info" style="margin-top:16px">' + (x.origen === "local" ? t("rv_efectivo_local", esc(x.cargado_por || "—")) : t("rv_efectivo")) + '</div>') +
+    (x.estado === "pendiente"
+      ? '<div class="campo" style="margin-top:16px"><label for="mr-motivo">' + t("rv_motivo") + '</label>' +
+        '<textarea id="mr-motivo" rows="2" placeholder="' + esc(t("rv_motivo_ph")) + '"></textarea></div>'
+      : "");
+
+  var local = x.origen === "local";
+  $("mr-pie").innerHTML = x.estado === "pendiente"
+    ? '<button class="btn btn-peligro" id="mr-rechazar">' + (local ? t("rv_faltante") : t("rv_rechazar")) + '</button>' +
+      '<button class="btn" id="mr-aprobar">' + (local || x.metodo === "efectivo" ? t("rv_confirmar_caja") : t("rv_aprobar")) + '</button>'
+    : '<button class="btn btn-linea" data-cerrar="modal-revisar">' + t("cerrar") + '</button>';
+
+  if ($("mr-aprobar")) $("mr-aprobar").onclick = function(){ resolverPago(x, true); };
+  if ($("mr-rechazar")) $("mr-rechazar").onclick = function(){
+    var motivo = $("mr-motivo").value.trim();
+    if (!motivo) { toast(t("err_falta_motivo_rechazo")); $("mr-motivo").focus(); return; }
+    confirmar(t("rv_rechazar_titulo"), local ? t("rv_faltante_texto") : t("rv_rechazar_texto"),
+      function(){ resolverPago(x, false, motivo); }, local ? t("rv_faltante") : t("rv_rechazar"));
+  };
+
+  abrirModal("modal-revisar");
+
+  if (x.metodo === "transferencia") {
+    try {
+      var c = await rpc("fn_panel_comprobante", { p_token:TOKEN, p_pago_id:x.id });
+      var caja = $("mr-comp");
+      if (!caja) return;
+      if (!c || !c.datos) { caja.innerHTML = t("rv_sin_comprobante"); return; }
+      var bin = atob(c.datos), arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      urlComprobante = URL.createObjectURL(new Blob([arr], { type:c.mime }));
+      var nombre = "comprobante-" + x.id + (c.mime === "application/pdf" ? ".pdf" : ".jpg");
+      caja.innerHTML = (c.mime === "application/pdf"
+          ? '<iframe src="' + urlComprobante + '" title="' + esc(t("rv_comprobante")) + '"></iframe>'
+          : '<img src="' + urlComprobante + '" alt="' + esc(t("rv_comprobante")) + '">') +
+        '<div class="acc"><a class="btn btn-sec btn-sm" href="' + urlComprobante + '" download="' + nombre + '" target="_blank" rel="noopener">' + t("rv_descargar") + '</a></div>';
+    } catch(e) {
+      if ($("mr-comp")) $("mr-comp").innerHTML = esc(e.message || t("err_servidor"));
+    }
+  }
+}
+
+async function resolverPago(x, aprobar, motivo){
+  var btns = document.querySelectorAll("#mr-pie .btn");
+  for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+  var ok = await operar("fn_panel_pago_resolver",
+    { p_token:TOKEN, p_pago_id:x.id, p_aprobar:aprobar, p_motivo:motivo || null },
+    async function(){
+      cerrarModal("modal-revisar");
+      await refrescar();
+      pintarPill();
+      toast(aprobar ? t("rv_aprobado_ok") : t("rv_rechazado_ok"));
+    });
+  if (!ok) for (var j = 0; j < btns.length; j++) btns[j].disabled = false;
+}
+
+
+/* ==========================================================================
+   VENTA EN EL LOCAL (los dos roles)
+   La cuenta en pantalla es para que el empleado sepa cuánto cobrar. El total
+   que vale es el que calcula la base con los precios reales.
+   ========================================================================== */
+function prodVenta(id){
+  return extra.productos_venta.filter(function(p){ return String(p.id) === String(id); })[0] || null;
+}
+function enVenta(id){
+  var i = ventaItems.filter(function(x){ return String(x.producto_id) === String(id); })[0];
+  return i ? i.cantidad : 0;
+}
+
+function pintarVenta(){
+  var sel = $("v-prod"), previo = sel.value;
+  sel.innerHTML = '<option value="">' + t("v_elegir") + '</option>' + extra.productos_venta.map(function(p){
+    var libre = p.stock - enVenta(p.id);
+    return '<option value="' + p.id + '"' + (libre <= 0 ? " disabled" : "") + '>' +
+           esc(t("v_quedan", p.nombre, libre)) + '</option>';
+  }).join("");
+  sel.value = previo;
+
+  if (!ventaSocio) {
+    $("v-socio").innerHTML = "";
+  } else {
+    var bloqueo = ventaSocio.estado !== "activo" ? t("v_socio_inactivo")
+                : (!ventaSocio.matricula_paga ? t("v_sin_matricula") : "");
+    $("v-socio").innerHTML =
+      '<div class="socio-venta"><div><div class="n">' + esc(ventaSocio.nombre + (ventaSocio.apellido ? " " + ventaSocio.apellido : "")) + '</div>' +
+      '<div class="d">' + esc(t("f_dni")) + ' ' + esc(ventaSocio.dni) + '</div></div>' +
+      '<button class="btn btn-linea btn-sm" id="v-otro">' + t("v_otro") + '</button></div>' +
+      (bloqueo ? '<div class="aviso a-err" style="margin:12px 0 0">' + bloqueo + '</div>' : "");
+    $("v-otro").onclick = function(){ ventaSocio = null; $("v-dni").value = ""; pintarVenta(); $("v-dni").focus(); };
+  }
+
+  var total = 0, gramos = 0;
+  ventaItems.forEach(function(i){ total += i.precio_tokens * i.cantidad; gramos += i.gramos * i.cantidad; });
+
+  var aviso = "";
+  var min = Number(extra.compra.min_g || 0), max = Number(extra.compra.max_g || 0);
+  if (gramos > 0 && min > 0 && gramos < min) aviso = t("v_min", numG(min), numG(min - gramos));
+  if (max > 0 && gramos > max) aviso = t("v_max", numG(max), numG(gramos - max));
+
+  $("v-items").innerHTML = ventaItems.length
+    ? ventaItems.map(function(i, idx){
+        return '<div class="linea-venta"><span>' + i.cantidad + ' × ' + esc(i.nombre) +
+               (i.gramos > 0 ? ' <span style="color:var(--texto-3)">· ' + numG(i.gramos * i.cantidad) + ' g</span>' : '') + '</span>' +
+               '<span style="display:flex;gap:10px;align-items:center"><span class="tok">' + icoToken() + num(i.precio_tokens * i.cantidad) + '</span>' +
+               '<button class="btn-icono" data-v-quitar="' + idx + '" aria-label="Quitar"><svg class="ico"><use href="#i-cruz"/></svg></button></span></div>';
+      }).join("") +
+      '<div class="totales-venta">' +
+        (gramos > 0 ? '<div class="dato"><span class="r">' + t("v_gramos") + '</span><span class="v">' + numG(gramos) + ' g</span></div>' : '') +
+        '<div class="dato"><span class="r">' + t("v_total") + '</span><span class="v"><span class="tok" style="font-size:18px">' + icoToken() + num(total) + '</span></span></div>' +
+      '</div>' +
+      (aviso ? '<div class="aviso a-avi">' + aviso + '</div>' : '')
+    : '<div class="vacio" style="padding:18px 0">' + t("v_sin_items") + '</div>';
+
+  var listo = ventaSocio && ventaSocio.estado === "activo" && ventaSocio.matricula_paga && ventaItems.length && !aviso;
+  $("v-registrar").disabled = !listo;
+}
+
+async function buscarSocioVenta(){
+  var dni = $("v-dni").value.replace(/\D/g, "");
+  if (dni.length < 6) { toast(t("err_dni_invalido")); return; }
+  var b = $("v-buscar");
+  b.disabled = true; b.textContent = t("v_buscando");
+  try {
+    var r = await rpc("fn_panel_socio_buscar", { p_token:TOKEN, p_dni:dni });
+    ventaSocio = r; ventaSocio.dni = dni;
+    pintarVenta();
+  } catch(e) {
+    ventaSocio = null; pintarVenta();
+    toast(e.message || t("err_servidor"));
+  } finally {
+    b.disabled = false; b.textContent = t("v_buscar");
+  }
+}
+
+function agregarVenta(){
+  var p = prodVenta($("v-prod").value);
+  var cant = parseInt($("v-cant").value, 10);
+  if (!p) { toast(t("v_elegir")); return; }
+  if (!cant || cant < 1) { toast(t("err_cantidad")); return; }
+  if (enVenta(p.id) + cant > p.stock) { toast(t("v_sin_stock")); return; }
+  var ya = ventaItems.filter(function(x){ return x.producto_id === p.id; })[0];
+  if (ya) ya.cantidad += cant;
+  else ventaItems.push({ producto_id:p.id, nombre:p.nombre, cantidad:cant,
+                         precio_tokens:Number(p.precio_tokens || 0), gramos:Number(p.gramos || 0) });
+  $("v-cant").value = "1"; $("v-prod").value = "";
+  pintarVenta();
+}
+
+async function registrarVenta(){
+  if (!ventaSocio) { toast(t("v_falta_socio")); return; }
+  $("v-registrar").disabled = true;
+  var items = ventaItems.map(function(i){ return { producto_id:i.producto_id, cantidad:i.cantidad }; });
+  var ok = await operar("fn_panel_venta_local", {
+    p_token:TOKEN, p_socio_id:ventaSocio.id, p_items:items, p_nota:$("v-nota").value.trim() || null
+  }, async function(r){
+    toast(t("v_ok", nroPedido(r.id), num(r.total)));
+    ventaSocio = null; ventaItems = [];
+    $("v-dni").value = ""; $("v-nota").value = "";
+    await refrescar();
+    pintarPill();
+  });
+  if (!ok) pintarVenta();
+}
+
+
+/* ==========================================================================
+   STOCK (los dos roles)
+   ========================================================================== */
+function recepcion(id){
+  return extra.recepciones.filter(function(r){ return String(r.id) === String(id); })[0] || null;
+}
+
+function pintarStock(){
+  if (esAdmin()) {
+    var sel = $("st-prod"), previo = sel.value;
+    sel.innerHTML = '<option value="">' + t("st_elegir") + '</option>' +
+      productos.slice().sort(function(a,b){ return a.nombre > b.nombre ? 1 : -1; }).map(function(p){
+        return '<option value="' + p.id + '">' + esc(p.nombre) + ' (' + p.stock + ')</option>';
+      }).join("");
+    sel.value = previo;
+  }
+
+  var pend = extra.recepciones.filter(function(r){ return r.estado === "pendiente"; });
+  $("tb-stock-pend").innerHTML = pend.length ? pend.map(function(r){
+    var nota0 = (r.notas || [])[0];
+    return '<tr><td><strong>' + esc(r.producto_nombre) + '</strong>' +
+        (nota0 ? '<span class="sub">' + esc(nota0.texto) + '</span>' : '') + '</td>' +
+      '<td class="num">' + num(r.cantidad_cargada) + '</td>' +
+      '<td>' + esc(r.cargado_por || "—") + '</td><td>' + fecha(r.cargado_en) + '</td>' +
+      '<td class="acc"><button class="btn btn-sm" data-rec-ok="' + r.id + '">' + t("st_coincide") + '</button> ' +
+      '<button class="btn btn-peligro btn-sm" data-rec-no="' + r.id + '">' + t("st_no_coincide") + '</button></td></tr>';
+  }).join("") : '<tr><td colspan="5" class="vacio">' + t("st_sin_pend") + '</td></tr>';
+
+  var hist = extra.recepciones.filter(function(r){ return r.estado !== "pendiente"; });
+  $("tb-stock-hist").innerHTML = hist.length ? hist.map(function(r){
+    var dif = Number(r.cantidad_recibida || 0) - Number(r.cantidad_cargada || 0);
+    var clase = r.estado === "coincide" ? "b-ok" : "b-no";
+    return '<tr><td><strong>' + esc(r.producto_nombre) + '</strong></td>' +
+      '<td class="num">' + num(r.cantidad_cargada) + '</td>' +
+      '<td class="num">' + num(r.cantidad_recibida) + '</td>' +
+      '<td class="num ' + (dif < 0 ? "dif-neg" : (dif > 0 ? "dif-pos" : "")) + '">' + (dif > 0 ? "+" : "") + num(dif) + '</td>' +
+      '<td><span class="badge ' + clase + '">' + t("se_" + r.estado) + '</span></td>' +
+      '<td>' + fecha(r.recibido_en) + '</td>' +
+      '<td class="acc"><button class="btn btn-linea btn-sm" data-rec-ver="' + r.id + '">' + t("st_notas") +
+        ((r.notas || []).length ? ' (' + r.notas.length + ')' : '') + '</button></td></tr>';
+  }).join("") : '<tr><td colspan="7" class="vacio">' + t("st_sin_hist") + '</td></tr>';
+}
+
+async function cargarStock(){
+  var id = $("st-prod").value, cant = parseInt($("st-cant").value, 10);
+  if (!id) { toast(t("err_falta_producto_st")); return; }
+  if (!cant || cant < 1) { toast(t("err_cantidad")); return; }
+  await operar("fn_panel_stock_cargar", { p_token:TOKEN, p_producto_id:Number(id), p_cantidad:cant,
+                                          p_nota:$("st-nota").value.trim() || null }, async function(){
+    $("st-cant").value = ""; $("st-nota").value = ""; $("st-prod").value = "";
+    await refrescar(); pintarPill();
+    toast(t("st_cargado_ok"));
+  });
+}
+
+function recibirCoincide(id){
+  var r = recepcion(id); if (!r) return;
+  confirmar(t("st_coincide_titulo"), t("st_coincide_texto", num(r.cantidad_cargada), num(r.cantidad_cargada)), function(){
+    operar("fn_panel_stock_recibir", { p_token:TOKEN, p_recepcion_id:r.id, p_cantidad:r.cantidad_cargada, p_nota:null }, async function(){
+      await refrescar(); pintarPill(); toast(t("st_recibido_ok"));
+    });
+  }, t("st_coincide"));
+}
+
+function abrirNoCoincide(id){
+  var r = recepcion(id); if (!r) return;
+  recibiendo = r;
+  $("rc-datos").innerHTML =
+    '<div class="dato"><span class="r">' + t("th_producto") + '</span><span class="v">' + esc(r.producto_nombre) + '</span></div>' +
+    '<div class="dato"><span class="r">' + t("st_cargado") + '</span><span class="v">' + num(r.cantidad_cargada) + '</span></div>' +
+    '<div class="dato"><span class="r"></span><span class="v">' + t("st_cargado_por", esc(r.cargado_por || "—"), fecha(r.cargado_en)) + '</span></div>';
+  $("rc-cant").value = ""; $("rc-nota").value = "";
+  $("rc-error").style.display = "none";
+  abrirModal("modal-recibir");
+  $("rc-cant").focus();
+}
+
+async function confirmarNoCoincide(){
+  var r = recibiendo; if (!r) return;
+  var cant = parseInt($("rc-cant").value, 10), nota = $("rc-nota").value.trim();
+  function fallar(m){ $("rc-error").textContent = m; $("rc-error").style.display = "block"; }
+  if (isNaN(cant) || cant < 0) { fallar(t("err_cantidad")); return; }
+  if (!nota) { fallar(t("err_falta_nota")); return; }
+  await operar("fn_panel_stock_recibir", { p_token:TOKEN, p_recepcion_id:r.id, p_cantidad:cant, p_nota:nota }, async function(){
+    cerrarModal("modal-recibir"); recibiendo = null;
+    await refrescar(); pintarPill(); toast(t("st_recibido_ok"));
+  });
+}
+
+function abrirRecepcion(id){
+  var r = recepcion(id); if (!r) return;
+  recepcionAbierta = r;
+  var dif = Number(r.cantidad_recibida || 0) - Number(r.cantidad_cargada || 0);
+  $("mrec-titulo").textContent = r.producto_nombre;
+  $("mrec-datos").innerHTML =
+    '<div class="dato"><span class="r">' + t("st_cargado") + '</span><span class="v">' + num(r.cantidad_cargada) + ' · ' + t("st_cargado_por", esc(r.cargado_por || "—"), fecha(r.cargado_en)) + '</span></div>' +
+    '<div class="dato"><span class="r">' + t("st_recibido") + '</span><span class="v">' + num(r.cantidad_recibida) + ' · ' + t("st_recibido_por", esc(r.recibido_por || "—"), fecha(r.recibido_en)) + '</span></div>' +
+    '<div class="dato"><span class="r">' + t("st_diferencia") + '</span><span class="v ' + (dif < 0 ? "dif-neg" : (dif > 0 ? "dif-pos" : "")) + '">' + (dif > 0 ? "+" : "") + num(dif) + '</span></div>';
+  var notas = r.notas || [];
+  $("mrec-notas").innerHTML = notas.length ? notas.map(function(n){
+    return '<div class="nota-hist"><div class="q">' + esc(n.quien || "—") + ' · ' + fecha(n.fecha) + '</div><div class="x">' + esc(n.texto) + '</div></div>';
+  }).join("") : '<div class="vacio" style="padding:10px 0">' + t("st_sin_notas") + '</div>';
+  $("mrec-nueva").value = "";
+  abrirModal("modal-recepcion");
+}
+
+async function guardarNotaRecepcion(){
+  var r = recepcionAbierta; if (!r) return;
+  var nota = $("mrec-nueva").value.trim();
+  if (!nota) { toast(t("err_falta_nota")); return; }
+  await operar("fn_panel_stock_nota", { p_token:TOKEN, p_recepcion_id:r.id, p_nota:nota }, async function(){
+    await refrescar(); abrirRecepcion(r.id); toast(t("st_nota_ok"));
+  });
+}
+
+
+/* ==========================================================================
+   CONFIGURACIÓN: compras, pagos y membresías
+   ========================================================================== */
+function valorCfg(k){ return config[k] && config[k].valor !== null ? config[k].valor : ""; }
+
+function pintarConfigCompras(){
+  $("cfg-min").value = valorCfg("compra_minima_g");
+  $("cfg-max").value = valorCfg("compra_maxima_g");
+  $("cfg-mat").value = valorCfg("matricula_tokens");
+  $("cfg-dias").value = valorCfg("comprobantes_dias");
+  $("cfg-transf").value = valorCfg("datos_transferencia");
+
+  $("tb-membresias").innerHTML = extra.membresias.length ? extra.membresias.map(function(m){
+    var est = m.activo ? '<span class="badge b-ok">' + t("memb_activa") + '</span>'
+            : (Number(m.tokens) > 0 ? '<span class="badge b-neutro">' + t("memb_oculta") + '</span>'
+                                    : '<span class="badge b-oro">' + t("memb_sin_precio") + '</span>');
+    return '<tr><td><strong>' + esc(m.nombre) + '</strong></td><td class="num">' + numG(m.gramos) + '</td>' +
+           '<td class="num">' + num(m.tokens) + '</td><td>' + est + '</td>' +
+           '<td class="acc"><button class="btn btn-sec btn-sm" data-editar-memb="' + m.id + '">' + t("editar") + '</button></td></tr>';
+  }).join("") : '<tr><td colspan="5" class="vacio">' + t("sin_membresias") + '</td></tr>';
+}
+
+async function guardarConfigCompras(){
+  var min = parseFloat($("cfg-min").value || "0"), max = parseFloat($("cfg-max").value || "0");
+  var mat = parseInt($("cfg-mat").value || "0", 10), dias = parseInt($("cfg-dias").value || "120", 10);
+  if ([min, max, mat, dias].some(function(n){ return isNaN(n) || n < 0; })) { toast(t("err_numero")); return; }
+  if (min > 0 && max > 0 && min > max) { toast(t("err_min_max")); return; }
+
+  var cambios = [
+    ["compra_minima_g", String(min)], ["compra_maxima_g", String(max)],
+    ["matricula_tokens", String(mat)], ["comprobantes_dias", String(Math.max(dias, 7))],
+    ["datos_transferencia", $("cfg-transf").value.trim()]
+  ];
+  var b = $("btn-cfg-compras"); b.disabled = true;
+  try {
+    for (var i = 0; i < cambios.length; i++) {
+      if (valorCfg(cambios[i][0]) === cambios[i][1]) continue;
+      await rpc("fn_panel_config", { p_token:TOKEN, p_clave:cambios[i][0], p_valor:cambios[i][1], p_descripcion:null });
+    }
+    await cargarTodo();
+    pintarConfig();
+    toast(t("cfgc_ok"));
+  } catch(e) {
+    toast(e.message || t("err_servidor"));
+  } finally {
+    b.disabled = false;
+  }
+}
+
+function abrirMembresia(id){
+  var m = id ? extra.membresias.filter(function(x){ return String(x.id) === String(id); })[0] : null;
+  editandoMemb = m || null;
+  $("mm-titulo").textContent = m ? t("memb_editar") : t("memb_nueva");
+  $("mm-nombre").value = m ? m.nombre : "";
+  $("mm-gramos").value = m ? Number(m.gramos) : "";
+  $("mm-tokens").value = m ? m.tokens : "";
+  $("mm-activo").value = m && m.activo ? "true" : "false";
+  $("mm-error").style.display = "none";
+  abrirModal("modal-membresia");
+}
+
+async function guardarMembresia(){
+  function fallar(msg){ $("mm-error").textContent = msg; $("mm-error").style.display = "block"; }
+  var datos = {
+    id: editandoMemb ? editandoMemb.id : null,
+    nombre: $("mm-nombre").value.trim(),
+    gramos: parseFloat(String($("mm-gramos").value).replace(",", ".")),
+    tokens: parseInt($("mm-tokens").value || "0", 10),
+    activo: $("mm-activo").value === "true",
+    orden: editandoMemb ? editandoMemb.orden : extra.membresias.length + 1
+  };
+  if (!datos.nombre || isNaN(datos.gramos) || datos.gramos <= 0) { fallar(t("err_memb_datos")); return; }
+  if (isNaN(datos.tokens) || datos.tokens < 0) { fallar(t("err_numero")); return; }
+  if (datos.activo && datos.tokens === 0) { fallar(t("err_memb_precio")); return; }
+  await operar("fn_panel_membresia_guardar", { p_token:TOKEN, p_datos:datos }, async function(){
+    cerrarModal("modal-membresia");
+    await cargarTodo(); pintarConfig(); toast(t("memb_ok"));
+  });
+}
+
+
+/* ==========================================================================
+   EVENTOS NUEVOS
+   ========================================================================== */
+var tabPagoBtns = document.querySelectorAll("#tabs-pagos button");
+for (var tp = 0; tp < tabPagoBtns.length; tp++) {
+  tabPagoBtns[tp].onclick = function(){ tabPagos = this.getAttribute("data-tabpago"); pintarPagos(); };
+}
+["f-pag-concepto","f-pag-metodo","f-pag-buscar"].forEach(function(id){ $(id).addEventListener("input", pintarPagos); });
+
+$("v-buscar").onclick = buscarSocioVenta;
+$("v-dni").addEventListener("keydown", function(e){ if (e.key === "Enter") buscarSocioVenta(); });
+$("v-agregar").onclick = agregarVenta;
+$("v-registrar").onclick = registrarVenta;
+
+$("st-cargar").onclick = cargarStock;
+$("rc-ok").onclick = confirmarNoCoincide;
+$("mrec-guardar").onclick = guardarNotaRecepcion;
+
+$("btn-cfg-compras").onclick = guardarConfigCompras;
+$("btn-nueva-membresia").onclick = function(){ abrirMembresia(null); };
+$("mm-guardar").onclick = guardarMembresia;
+
+document.addEventListener("click", function(e){
+  var el = e.target.closest ? e.target.closest("[data-revisar],[data-rec-ok],[data-rec-no],[data-rec-ver],[data-v-quitar],[data-editar-memb]") : null;
+  if (!el) return;
+  var v;
+  if ((v = el.getAttribute("data-revisar")))     { abrirRevisar(v); return; }
+  if ((v = el.getAttribute("data-rec-ok")))      { recibirCoincide(v); return; }
+  if ((v = el.getAttribute("data-rec-no")))      { abrirNoCoincide(v); return; }
+  if ((v = el.getAttribute("data-rec-ver")))     { abrirRecepcion(v); return; }
+  if ((v = el.getAttribute("data-editar-memb"))) { abrirMembresia(v); return; }
+  if ((v = el.getAttribute("data-v-quitar")) !== null) { ventaItems.splice(Number(v), 1); pintarVenta(); return; }
+});
+
+
+/* ==========================================================================
    ARRANQUE
    ========================================================================== */
 (async function(){
   aplicarTextos();
 
-  if (MODO_DEMO) {
-    document.body.classList.add("demo");
-    $("login-ayuda").innerHTML = t("demo_ayuda");
-  } else {
-    $("cinta-demo").style.display = "none";
+  /* Sin claves no hay nada que hacer: se avisa y se traba la entrada. */
+  if (!CONFIGURADO) {
+    $("login-ayuda").innerHTML = t("sin_configurar_detalle");
+    $("login-ayuda").className = "legal aviso-config";
+    $("btn-entrar").disabled = true;
+    $("in-usuario").disabled = true;
+    $("in-pass").disabled = true;
+    return;
   }
 
   var hoy = new Date();
@@ -3394,7 +3935,7 @@ document.addEventListener("click", function(e){
   /* Si hay un token guardado, se prueba contra la base: si venció o le
      sacaron el acceso al usuario, vuelve al login sin dramas. */
   var guardado = sessionStorage.getItem(CLAVE_SESION);
-  if (guardado && !MODO_DEMO) {
+  if (guardado) {
     TOKEN = guardado;
     try {
       var d = await rpc("fn_panel_datos", { p_token:TOKEN });
